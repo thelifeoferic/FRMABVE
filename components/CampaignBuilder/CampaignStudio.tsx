@@ -22,6 +22,9 @@ import type { RefObject } from "react";
 const initialInput: CampaignInput = {
   brandId: "asheville-dispensary",
   campaignName: "",
+  fromName: "",
+  fromEmail: "",
+  replyToEmail: "",
   subjectLine: "",
   previewText: "",
   products: "",
@@ -115,6 +118,9 @@ export function CampaignStudio() {
     setInput((current) => ({
       ...current,
       brandId,
+      fromName: nextBrand.sample.fromName,
+      fromEmail: nextBrand.sample.fromEmail,
+      replyToEmail: nextBrand.sample.replyToEmail,
       products: "",
       productIds: [],
       assets: [],
@@ -139,6 +145,9 @@ export function CampaignStudio() {
     const nextFields = createMockKlaviyoFields(input);
     const nextInput = {
       ...input,
+      fromName: input.fromName || selectedBrand.sample.fromName,
+      fromEmail: input.fromEmail || selectedBrand.sample.fromEmail,
+      replyToEmail: input.replyToEmail || selectedBrand.sample.replyToEmail,
       subjectLine: input.subjectLine || nextFields.subjectLine,
       previewText: input.previewText || nextFields.previewText
     };
@@ -180,7 +189,7 @@ export function CampaignStudio() {
   }
 
   async function createDraft() {
-    if (!strategy || !selectedConcept || !selectedImage?.imageUrl) return;
+    if (!strategy || !selectedConcept) return;
     setDrafting(true);
     const response = await fetch("/api/klaviyo/draft", {
       method: "POST",
@@ -191,7 +200,7 @@ export function CampaignStudio() {
         input,
         strategy,
         concept: selectedConcept,
-        generatedImages: [selectedImage]
+        generatedImages: selectedImage ? [selectedImage] : []
       })
     });
     const body = (await response.json()) as { draft: KlaviyoDraft };

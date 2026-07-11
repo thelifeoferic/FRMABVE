@@ -3,6 +3,9 @@ export type BrandId = "asheville-dispensary" | "plant-bar";
 export type CampaignInput = {
   brandId: BrandId;
   campaignName: string;
+  fromName: string;
+  fromEmail: string;
+  replyToEmail: string;
   subjectLine: string;
   previewText: string;
   products: string;

@@ -32,6 +32,9 @@ export function buildKlaviyoCampaignPayload(
 ) {
   const brand = getCampaignBrand(input.brandId);
   const campaignName = input.campaignName || `${input.products || brand.name} Campaign`;
+  const fromName = input.fromName || brand.sample.fromName;
+  const fromEmail = input.fromEmail || brand.sample.fromEmail;
+  const replyToEmail = input.replyToEmail || input.fromEmail || brand.sample.replyToEmail;
   const safeCampaignName = campaignName.toLowerCase().includes("do not send")
     ? campaignName
     : `${campaignName} - Draft Test - Do Not Send`;
@@ -55,7 +58,10 @@ export function buildKlaviyoCampaignPayload(
                   label: `${safeCampaignName} Email`,
                   content: {
                     subject: input.subjectLine || strategy.headline,
-                    preview_text: input.previewText || strategy.subheadline
+                    preview_text: input.previewText || strategy.subheadline,
+                    from_label: fromName,
+                    from_email: fromEmail,
+                    reply_to_email: replyToEmail
                   }
                 }
               }
@@ -124,6 +130,11 @@ export function buildCampaignStudioPackage(
       name: input.audience
     },
     emailDraft,
+    sender: {
+      fromName: input.fromName || brand.sample.fromName,
+      fromEmail: input.fromEmail || brand.sample.fromEmail,
+      replyToEmail: input.replyToEmail || brand.sample.replyToEmail
+    },
     safety: {
       mode: "draft-only-test",
       mustNotSend: true,

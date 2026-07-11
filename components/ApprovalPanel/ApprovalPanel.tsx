@@ -11,19 +11,24 @@ type ApprovalPanelProps = {
 };
 
 export function ApprovalPanel({ input, strategy, selectedConcept, selectedImage, draft, drafting, onCreateDraft }: ApprovalPanelProps) {
-  const ready = Boolean(strategy && selectedConcept && selectedImage?.imageUrl && input.subjectLine && input.previewText);
+  const hasAudience = Boolean(input.klaviyoAudienceId || input.audienceId);
+  const ready = Boolean(strategy && selectedConcept && hasAudience && input.subjectLine && input.previewText && input.fromName && input.fromEmail);
 
   return (
     <section className="panel approval-panel" aria-label="Approval">
       <div className="section-heading">
         <p>Klaviyo Draft Review</p>
-        <span>{selectedImage ? `${selectedImage.style} ${selectedImage.version} selected` : "Choose an image"}</span>
+        <span>{selectedImage ? `${selectedImage.style} ${selectedImage.version} selected` : "Image optional"}</span>
       </div>
 
       <div className="approval-preview">
         <span>{input.campaignName || "Untitled Campaign"}</span>
         <strong>{input.subjectLine || "Subject line pending"}</strong>
         <p>{input.previewText || "Generate Klaviyo fields and choose one image."}</p>
+        <small>
+          From: {input.fromName || "Missing"} {input.fromEmail ? `<${input.fromEmail}>` : ""}
+        </small>
+        <small>Audience: {input.klaviyoAudienceId || input.audienceId || "Missing"}</small>
         <em>{strategy?.cta ?? input.cta ?? "CTA"}</em>
       </div>
 

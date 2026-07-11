@@ -23,6 +23,9 @@ function createSample(brand: CampaignBrand): CampaignInput {
   return {
   brandId: brand.id,
   campaignName: brand.sample.campaignName,
+  fromName: brand.sample.fromName,
+  fromEmail: brand.sample.fromEmail,
+  replyToEmail: brand.sample.replyToEmail,
   subjectLine: brand.sample.subjectLine,
   previewText: brand.sample.previewText,
   products: brand.sample.products,
@@ -236,6 +239,32 @@ export function PromptBox({
             AI generate
           </button>
         </div>
+        <div className="brief-meta">
+          <label>
+            From name
+            <input
+              value={value.fromName}
+              onChange={(event) => update("fromName", event.target.value)}
+              placeholder={brand.sample.fromName}
+            />
+          </label>
+          <label>
+            From email
+            <input
+              value={value.fromEmail}
+              onChange={(event) => update("fromEmail", event.target.value)}
+              placeholder={brand.sample.fromEmail}
+            />
+          </label>
+        </div>
+        <label>
+          Reply-to email
+          <input
+            value={value.replyToEmail}
+            onChange={(event) => update("replyToEmail", event.target.value)}
+            placeholder={brand.sample.replyToEmail}
+          />
+        </label>
         <label>
           Subject line
           <input

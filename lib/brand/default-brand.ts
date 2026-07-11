@@ -18,6 +18,9 @@ export type CampaignBrand = {
   logoPrompt: string;
   sample: {
     campaignName: string;
+    fromName: string;
+    fromEmail: string;
+    replyToEmail: string;
     subjectLine: string;
     previewText: string;
     products: string;
@@ -49,6 +52,9 @@ export const campaignBrands: Record<BrandId, CampaignBrand> = {
     logoPrompt: "Include the Asheville Dispensary logo as a tasteful brand mark integrated into the design.",
     sample: {
       campaignName: "SOHI Social Gummies Launch",
+      fromName: "Asheville Dispensary",
+      fromEmail: "marketing@avldispensary.com",
+      replyToEmail: "marketing@avldispensary.com",
       subjectLine: "Buy 2 Get 1 on SOHI Social Gummies",
       previewText: "A relaxed edible campaign for discovering Pineapple Passionfruit and Black Cherry gummies.",
       products: "SOHI Social Gummies: Pineapple Passionfruit, Black Cherry",
@@ -78,6 +84,9 @@ export const campaignBrands: Record<BrandId, CampaignBrand> = {
     logoPrompt: "Include the Plant Bar logo as a tasteful brand mark integrated into the design.",
     sample: {
       campaignName: "Plant Bar Summer Seasonal",
+      fromName: "Plant Bar",
+      fromEmail: "hello@visitplantbar.com",
+      replyToEmail: "hello@visitplantbar.com",
       subjectLine: "Fresh summer pours at Plant Bar",
       previewText: "Honey, citrus, mint, hibiscus, and rose for the mood you are in.",
       products: "Summer Seasonal Menu, Botanical Zero-Proof Cocktails, Boba Tea",
