@@ -43,8 +43,8 @@ const initialInput: CampaignInput = {
 };
 
 const steps = ["Brief", "Klaviyo Fields", "Images", "Review", "Klaviyo Draft"];
-const economyImageCount = 2;
-const similarVariants: GeneratedImage["version"][] = ["A", "B"];
+const economyImageCount = 3;
+const similarVariants: GeneratedImage["version"][] = ["A", "B", "C"];
 
 export function CampaignStudio() {
   const [input, setInput] = useState<CampaignInput>(initialInput);
@@ -271,7 +271,7 @@ export function CampaignStudio() {
     const similarBriefs: GeneratedImage[] = similarVariants.map((variant) => ({
       ...sourceImage,
       id: `${sourceImage.id}-similar-${variant.toLowerCase()}-${Date.now()}`,
-      version: variant === "A" ? "A" : "B",
+      version: variant,
       status: "brief-ready",
       imageUrl: undefined,
       error: undefined,

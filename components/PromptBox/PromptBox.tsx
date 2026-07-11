@@ -235,10 +235,11 @@ export function PromptBox({
       <div className="klaviyo-fields">
         <div className="section-heading compact-heading">
           <p>Klaviyo Fields</p>
-          <button className="ghost-button" type="button" onClick={onGenerateFields}>
-            AI generate
-          </button>
+          <span>Draft fields v2</span>
         </div>
+        <button className="ghost-button" type="button" onClick={onGenerateFields}>
+          AI generate
+        </button>
         <div className="brief-meta">
           <label>
             From name
