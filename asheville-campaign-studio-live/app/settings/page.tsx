@@ -3,7 +3,13 @@ const brandKits = [
     name: "Asheville Dispensary",
     description: "Cannabis, apothecary, and lounge assets for campaign work.",
     logo: "/brand-imagery/asheville-round-logo.png",
-    fonts: ["Iskra W01", "Montserrat", "Compact campaign copy"],
+    fonts: [
+      ["Iskra Regular", "/brand-kit/asheville-dispensary/fonts/iskra-w01-regular.ttf"],
+      ["Iskra Medium", "/brand-kit/asheville-dispensary/fonts/iskra-w01-medium.ttf"],
+      ["Iskra Bold", "/brand-kit/asheville-dispensary/fonts/iskra-w01-bold.ttf"],
+      ["Montserrat", "/brand-kit/asheville-dispensary/fonts/montserrat-variable.ttf"],
+      ["Montserrat Italic", "/brand-kit/asheville-dispensary/fonts/montserrat-italic-variable.ttf"]
+    ],
     colors: [
       ["Cream", "#f8f4ec"],
       ["Black", "#171717"],
@@ -18,11 +24,6 @@ const brandKits = [
       ["Hero logo", "/brand-imagery/asheville-round-logo.png"],
       ["Leaf hero image", "/brand-imagery/asheville-leaf-hero.jpg"],
       ["Brand notes", "/brand-kit/asheville-dispensary/asheville-dispensary-brand-notes.txt"],
-      ["Iskra Regular", "/brand-kit/asheville-dispensary/fonts/iskra-w01-regular.ttf"],
-      ["Iskra Medium", "/brand-kit/asheville-dispensary/fonts/iskra-w01-medium.ttf"],
-      ["Iskra Bold", "/brand-kit/asheville-dispensary/fonts/iskra-w01-bold.ttf"],
-      ["Montserrat", "/brand-kit/asheville-dispensary/fonts/montserrat-variable.ttf"],
-      ["Montserrat Italic", "/brand-kit/asheville-dispensary/fonts/montserrat-italic-variable.ttf"],
       ["CTA button specs", "/brand-kit/asheville-dispensary/asheville-cta-button-specs.txt"],
       ["Weekly Strain prompt", "/brand-kit/asheville-dispensary/prompts/weekly-strain-integrity.txt"]
     ]
@@ -31,7 +32,11 @@ const brandKits = [
     name: "Plant Bar",
     description: "Coffee, tea, boba, and zero-proof brand direction for mood-led campaigns.",
     logo: "/brand-kit/plant-bar/plant-bar-logo-wide.png",
-    fonts: ["Archivo-style sans", "Scotch-style editorial serif", "Warm script accent"],
+    fonts: [
+      ["Archivo-style sans", ""],
+      ["Scotch-style editorial serif", ""],
+      ["Warm script accent", ""]
+    ],
     colors: [
       ["Mint", "#e5f5ef"],
       ["Blush", "#ffa2a8"],
@@ -131,8 +136,14 @@ export default function SettingsPage() {
             <div className="brand-kit-section">
               <h2>Fonts</h2>
               <div className="brand-font-list">
-                {brand.fonts.map((font) => (
-                  <span key={font}>{font}</span>
+                {brand.fonts.map(([label, href]) => (
+                  href ? (
+                    <a href={href} download key={href}>
+                      {label}
+                    </a>
+                  ) : (
+                    <span key={label}>{label}</span>
+                  )
                 ))}
               </div>
             </div>
