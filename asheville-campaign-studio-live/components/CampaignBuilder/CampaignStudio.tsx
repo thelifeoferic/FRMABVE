@@ -315,6 +315,7 @@ export function CampaignStudio() {
     <main className="studio-shell" data-brand={selectedBrand.id}>
       <header className="topbar">
         <img src={selectedBrand.heroSrc} alt={selectedBrand.heroAlt} />
+        <img className="hero-brand-logo" src={selectedBrand.logoSrc} alt={`${selectedBrand.name} logo`} />
         <div className="hero-copy">
           <div className="brand-selector" aria-label="Brand selector">
             <label>
@@ -353,6 +354,9 @@ export function CampaignStudio() {
         ))}
         <a className="stepper-link" href="/settings">
           Brand Kit
+        </a>
+        <a className="stepper-link" href="/prompts">
+          AI Prompts
         </a>
       </nav>
 
