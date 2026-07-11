@@ -22,9 +22,9 @@ import type { RefObject } from "react";
 const initialInput: CampaignInput = {
   brandId: "asheville-dispensary",
   campaignName: "",
-  fromName: "",
-  fromEmail: "",
-  replyToEmail: "",
+  fromName: "Asheville Dispensary",
+  fromEmail: "no-reply@avldispensary.com",
+  replyToEmail: "support@avldispensary.com",
   subjectLine: "",
   previewText: "",
   products: "",
@@ -351,6 +351,9 @@ export function CampaignStudio() {
             {step}
           </button>
         ))}
+        <a className="stepper-link" href="/settings">
+          Brand Kit
+        </a>
       </nav>
 
       <div className="workspace">

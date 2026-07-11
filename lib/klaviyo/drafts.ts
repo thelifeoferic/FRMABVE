@@ -23,6 +23,24 @@ function getKlaviyoPrivateApiKey(brandId: CampaignInput["brandId"]) {
   return getServerEnv("ASHEVILLE_KLAVIYO_PRIVATE_API_KEY") ?? getServerEnv("KLAVIYO_PRIVATE_API_KEY");
 }
 
+function getSender(input: CampaignInput) {
+  const brand = getCampaignBrand(input.brandId);
+
+  if (brand.id === "asheville-dispensary") {
+    return {
+      fromName: input.fromName || brand.sample.fromName,
+      fromEmail: "no-reply@avldispensary.com",
+      replyToEmail: "support@avldispensary.com"
+    };
+  }
+
+  return {
+    fromName: input.fromName || brand.sample.fromName,
+    fromEmail: input.fromEmail || brand.sample.fromEmail,
+    replyToEmail: input.replyToEmail || input.fromEmail || brand.sample.replyToEmail
+  };
+}
+
 export function buildKlaviyoCampaignPayload(
   input: CampaignInput,
   strategy: CampaignStrategy,
@@ -32,9 +50,7 @@ export function buildKlaviyoCampaignPayload(
 ) {
   const brand = getCampaignBrand(input.brandId);
   const campaignName = input.campaignName || `${input.products || brand.name} Campaign`;
-  const fromName = input.fromName || brand.sample.fromName;
-  const fromEmail = input.fromEmail || brand.sample.fromEmail;
-  const replyToEmail = input.replyToEmail || input.fromEmail || brand.sample.replyToEmail;
+  const { fromName, fromEmail, replyToEmail } = getSender(input);
   const safeCampaignName = campaignName.toLowerCase().includes("do not send")
     ? campaignName
     : `${campaignName} - Draft Test - Do Not Send`;
@@ -83,6 +99,7 @@ export function buildCampaignStudioPackage(
   const campaignName = input.campaignName || `${input.products || brand.name} Campaign`;
   const products = input.products.split(",").map((product) => product.trim()).filter(Boolean);
   const testReviewDate = "2026-08-22";
+  const sender = getSender(input);
   const imageGenerationBrief = {
     owner: "OpenAI Images API recommended; pending API key and generation endpoint",
     style: concept.name,
@@ -130,11 +147,7 @@ export function buildCampaignStudioPackage(
       name: input.audience
     },
     emailDraft,
-    sender: {
-      fromName: input.fromName || brand.sample.fromName,
-      fromEmail: input.fromEmail || brand.sample.fromEmail,
-      replyToEmail: input.replyToEmail || brand.sample.replyToEmail
-    },
+    sender,
     safety: {
       mode: "draft-only-test",
       mustNotSend: true,

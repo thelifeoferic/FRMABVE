@@ -255,6 +255,7 @@ export function PromptBox({
               value={value.fromEmail}
               onChange={(event) => update("fromEmail", event.target.value)}
               placeholder={brand.sample.fromEmail}
+              readOnly={brand.id === "asheville-dispensary"}
             />
           </label>
         </div>
@@ -264,6 +265,7 @@ export function PromptBox({
             value={value.replyToEmail}
             onChange={(event) => update("replyToEmail", event.target.value)}
             placeholder={brand.sample.replyToEmail}
+            readOnly={brand.id === "asheville-dispensary"}
           />
         </label>
         <label>
