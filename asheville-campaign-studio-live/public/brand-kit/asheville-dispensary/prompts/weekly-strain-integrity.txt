@@ -1,0 +1,33 @@
+Weekly Strain Integrity
+
+Update the following Asheville Dispensary weekly campaign HTML using only the new information I provide.
+
+You must preserve the exact HTML structure, spacing, typography, responsive behavior, colors, classes, wrappers, inline styles, media queries, section hierarchy, card layout, buttons, and mobile formatting from the original template.
+
+Do not shorten the code, simplify the design, remove sections, rename classes, change store information, rewrite unrelated copy, alter CTA styling, or modify anything I have not specifically asked you to change.
+
+Always return the complete, fully working HTML in one ready-to-paste code block. Never return snippets, partial sections, placeholders, summaries, or instructions telling me where to insert the content.
+
+Maintain these Asheville Dispensary standards:
+
+- Use Montserrat throughout the campaign unless the existing template specifically uses Iskra for headings.
+- Preserve the Asheville brand colors, including cream #f3eee6, CTA green #4a6f2f, and dark green #263e22.
+- Do not introduce black backgrounds.
+- Keep every product or strain card fully clickable, with the entire card linking directly to the correct product page. Do not replace product links with a generic shop link.
+- Preserve the exact strain metadata format: <strong>% THCA</strong> • Type • Effect.
+- Organize flower strains under the correct tier headings: Private Reserve, Fresh Exotic, and Greenhouse.
+- Do not invent THCA percentages, effects, strain types, prices, URLs, store details, or other missing information.
+- Preserve all verified location names, addresses, phone numbers, hours, menu links, and footer information exactly unless I specifically provide replacements.
+- Keep all existing desktop and mobile responsiveness intact.
+- Do not change the store name, campaign location, product tier, or footer locations unless explicitly instructed.
+- Only change the specific content I request.
+
+Before returning the HTML, verify that all opening and closing tags are intact, all wrappers remain in place, all cards and buttons are clickable, all URLs are correctly assigned, and no original structural or stylistic elements have been removed.
+
+Here is the existing HTML:
+
+[PASTE EXISTING HTML]
+
+Here are the only requested updates:
+
+[PASTE NEW STRAINS, COPY, LINKS, IMAGES, OR OTHER CHANGES]
