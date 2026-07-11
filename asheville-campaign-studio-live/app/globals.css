@@ -11,10 +11,10 @@
   --brand-panel: rgba(17, 36, 20, 0.76);
   --brand-panel-border: rgba(248, 244, 236, 0.34);
   --brand-pill: rgba(17, 36, 20, 0.72);
-  --action-bg: #172c18;
+  --action-bg: #4a6f2f;
   --action-text: #ffffff;
   --focus-rgb: 49, 95, 52;
-  --brand-green: #1f3f21;
+  --brand-green: #263e22;
   --brand-green-2: #284e29;
   --moss: #315f34;
   --cream: #f8f4ec;
@@ -46,6 +46,14 @@
   src: url("/brand-kit/asheville-dispensary/fonts/iskra-w01-bold.ttf") format("truetype");
   font-style: normal;
   font-weight: 800;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Montserrat AVL";
+  src: url("/brand-kit/asheville-dispensary/fonts/montserrat-variable.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
   font-display: swap;
 }
 
@@ -353,13 +361,15 @@ dd,
 .stepper button,
 .stepper-link {
   border: 1px solid rgba(49, 95, 52, 0.36);
-  border-radius: 999px;
+  border-radius: 3px;
   flex: 1 1 138px;
   min-height: 42px;
   background: var(--action-bg);
   color: var(--action-text);
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 760;
+  letter-spacing: 0.04em;
   padding: 8px 14px;
   text-align: center;
   text-decoration: none;
@@ -385,16 +395,16 @@ dd,
 
 .stepper-link {
   flex: 0 1 168px;
-  background: var(--gold);
-  border-color: rgba(20, 23, 18, 0.26);
-  color: var(--ink);
-  box-shadow: 0 12px 30px rgba(201, 162, 74, 0.24);
+  background: #fffdf8;
+  border-color: var(--action-bg);
+  color: var(--action-bg);
+  box-shadow: 0 12px 30px rgba(49, 95, 52, 0.12);
 }
 
 .stepper-link:hover {
-  background: #d8b75e;
-  border-color: rgba(20, 23, 18, 0.42);
-  color: var(--ink);
+  background: #ffffff;
+  border-color: var(--moss);
+  color: var(--brand-green);
 }
 
 .workspace {
@@ -640,7 +650,7 @@ select:focus {
   display: inline-grid;
   min-height: 36px;
   align-items: center;
-  border-radius: 8px;
+  border-radius: 3px;
   background: var(--action-bg);
   color: var(--action-text);
   font-size: 14px;
@@ -796,12 +806,14 @@ select:focus {
 
 .primary-button,
 .ghost-button {
-  min-height: 42px;
-  border-radius: 8px;
+  min-height: 52px;
+  border-radius: 3px;
   border: 0;
-  padding: 0 14px;
+  padding: 0 18px;
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 760;
+  letter-spacing: 0.04em;
   line-height: 1;
 }
 
@@ -820,7 +832,7 @@ select:focus {
 }
 
 .ghost-button {
-  min-height: 34px;
+  min-height: 40px;
   border: 1px solid var(--action-bg);
   background: var(--action-bg);
   color: var(--action-text);
@@ -1358,10 +1370,13 @@ dd {
 
 .ghost-link {
   justify-self: start;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--ink);
+  border: 1px solid var(--action-bg);
+  border-radius: 3px;
+  background: #fffdf8;
+  color: var(--action-bg);
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
   font-weight: 850;
+  letter-spacing: 0.04em;
   padding: 10px 16px;
   text-decoration: none;
 }
@@ -1376,6 +1391,86 @@ dd {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 22px;
+}
+
+.brand-rules-intro {
+  display: grid;
+  gap: 8px;
+  border-color: rgba(49, 95, 52, 0.28);
+  background: linear-gradient(135deg, rgba(49, 95, 52, 0.08), rgba(255, 253, 248, 0.94));
+}
+
+.brand-rules-intro h2 {
+  margin: 0;
+  font-family: "Iskra W01", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(26px, 3vw, 42px);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.brand-rules-intro p {
+  max-width: 760px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.cta-spec-card {
+  display: grid;
+  gap: 18px;
+}
+
+.cta-spec-preview {
+  display: grid;
+  place-items: center;
+  min-height: 190px;
+  background: #f3eee6;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 36px 24px;
+}
+
+.cta-spec-preview span {
+  display: grid;
+  place-items: center;
+  width: min(685px, 100%);
+  min-height: 108px;
+  border-radius: 3px;
+  background: #4a6f2f;
+  color: #ffffff;
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(24px, 3vw, 34px);
+  font-weight: 760;
+  letter-spacing: 0.055em;
+  text-align: center;
+}
+
+.cta-spec-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cta-spec-row {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: #fffdf8;
+  padding: 12px;
+}
+
+.cta-spec-row strong {
+  color: var(--brand-green);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cta-spec-row span {
+  color: var(--muted);
+  line-height: 1.35;
 }
 
 .brand-rules-card {
@@ -1429,7 +1524,7 @@ dd {
   display: inline-block;
   margin-top: 12px;
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 3px;
   background: var(--action-bg);
   color: var(--action-text);
   font-size: 13px;
@@ -1531,7 +1626,7 @@ dd {
 .brand-font-list span,
 .brand-download-list a {
   border: 1px solid var(--line);
-  border-radius: 999px;
+  border-radius: 3px;
   background: #fffdf8;
   color: var(--ink);
   font-size: 13px;
@@ -1556,6 +1651,10 @@ dd {
 
   .brand-rules-grid {
     grid-template-columns: 1fr;
+  }
+
+  .cta-spec-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .concept-grid {
@@ -1595,6 +1694,15 @@ dd {
 
   .workspace {
     padding: 0 16px;
+  }
+
+  .cta-spec-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cta-spec-preview {
+    min-height: 150px;
+    padding: 20px;
   }
 
   .prompt-grid,

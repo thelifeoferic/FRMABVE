@@ -21,6 +21,7 @@ const brandKits = [
       ["Iskra Bold", "/brand-kit/asheville-dispensary/fonts/iskra-w01-bold.ttf"],
       ["Montserrat", "/brand-kit/asheville-dispensary/fonts/montserrat-variable.ttf"],
       ["Montserrat Italic", "/brand-kit/asheville-dispensary/fonts/montserrat-italic-variable.ttf"],
+      ["CTA button specs", "/brand-kit/asheville-dispensary/asheville-cta-button-specs.txt"],
       ["Weekly Strain prompt", "/brand-kit/asheville-dispensary/prompts/weekly-strain-integrity.txt"]
     ]
   },
@@ -54,6 +55,7 @@ const aiRuleSets = [
       "Return the complete working HTML in one ready-to-paste code block, never snippets or placeholders.",
       "Use Montserrat throughout unless the existing template specifically uses Iskra for headings.",
       "Preserve cream #f3eee6, CTA green #4a6f2f, and dark green #263e22, and do not introduce black backgrounds.",
+      "Preserve Asheville CTA styling: flat #4a6f2f rectangular buttons, 2-3 px radius, centered white Montserrat SemiBold or Bold text, and no shadow unless the original template already uses one.",
       "Keep every product or strain card fully clickable and linked to the correct product page.",
       "Preserve strain metadata as <strong>% THCA</strong> • Type • Effect.",
       "Organize flower strains under Private Reserve, Fresh Exotic, and Greenhouse.",
@@ -93,6 +95,21 @@ const aiRuleSets = [
   }
 ];
 
+const ctaButtonSpecs = [
+  ["Canvas", "878 x 230 px"],
+  ["Background", "#f3eee6 cream"],
+  ["Button size", "685 x 108 px"],
+  ["Button position", "X 104 px, Y 62 px"],
+  ["Button fill", "#4a6f2f"],
+  ["Corner radius", "2-3 px"],
+  ["Text", "Montserrat SemiBold or Bold"],
+  ["Text size", "31-34 px"],
+  ["Text color", "#ffffff"],
+  ["Letter spacing", "4-6% in Canva"],
+  ["Alignment", "Center text horizontally and vertically"],
+  ["Effects", "No shadow, no outline"]
+];
+
 export default function SettingsPage() {
   return (
     <main className="settings-page brand-kit-page">
@@ -110,9 +127,38 @@ export default function SettingsPage() {
         </a>
       </section>
 
+      <section className="panel brand-rules-intro">
+        <div className="section-heading">
+          <p>AI Rules & Prompts</p>
+          <span>Reusable guardrails</span>
+        </div>
+        <h2>Prompt rules the studio should respect every time.</h2>
+        <p>
+          Use these as the source of truth for campaign HTML updates, image generation, and brand-safe creative direction.
+        </p>
+      </section>
+
+      <section className="panel cta-spec-card" aria-label="Asheville CTA button specs">
+        <div className="section-heading">
+          <p>CTA Button Specs</p>
+          <span>Canva-ready</span>
+        </div>
+        <div className="cta-spec-preview" aria-label="CTA button preview">
+          <span>Shop All THCA Flower</span>
+        </div>
+        <div className="cta-spec-grid">
+          {ctaButtonSpecs.map(([label, value]) => (
+            <div className="cta-spec-row" key={label}>
+              <strong>{label}</strong>
+              <span>{value}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="brand-rules-grid" aria-label="AI rules and prompts">
         {aiRuleSets.map((ruleSet) => (
-          <article className="panel brand-rules-card" key={ruleSet.brand}>
+          <article className="panel brand-rules-card" key={`${ruleSet.brand}-${ruleSet.name}`}>
             <div className="section-heading">
               <p>{ruleSet.name}</p>
               <span>AI rules & prompts</span>

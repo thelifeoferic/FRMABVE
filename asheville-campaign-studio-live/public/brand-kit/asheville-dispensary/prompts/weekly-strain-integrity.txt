@@ -12,6 +12,7 @@ Maintain these Asheville Dispensary standards:
 
 - Use Montserrat throughout the campaign unless the existing template specifically uses Iskra for headings.
 - Preserve the Asheville brand colors, including cream #f3eee6, CTA green #4a6f2f, and dark green #263e22.
+- Preserve Asheville CTA button styling: flat #4a6f2f rectangular buttons, 2-3 px radius, centered white Montserrat SemiBold or Bold text, and no shadow unless the original template already uses one.
 - Do not introduce black backgrounds.
 - Keep every product or strain card fully clickable, with the entire card linking directly to the correct product page. Do not replace product links with a generic shop link.
 - Preserve the exact strain metadata format: <strong>% THCA</strong> • Type • Effect.
