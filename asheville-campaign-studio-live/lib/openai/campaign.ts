@@ -1,6 +1,21 @@
 import { getCampaignBrand } from "@/lib/brand/default-brand";
 import type { CampaignInput, CampaignStrategy, GeneratedImage, VisualConcept } from "@/lib/types/campaign";
 
+const brandImageGuidelines = {
+  "asheville-dispensary": [
+    "Use a premium cannabis apothecary look with cream, black, deep green, and warm gold.",
+    "Keep product packaging readable, centered, and fully inside the image with generous margin.",
+    "Use natural shadows, restrained offer hierarchy, and product-forward composition."
+  ],
+  "plant-bar": [
+    "Honor the Plant Bar guide: soft mint backgrounds, blush pink brand energy, deep navy contrast, cocoa-brown warmth, and tea/coffee amber accents.",
+    "Use an editorial cafe and botanical beverage style: specialty coffee, tea, boba, zero-proof cocktails, glassware, garnish, texture, and warm human connection.",
+    "Typography direction should feel like bold Archivo for clear labels paired with refined Scotch-style editorial serif or warm hand-script energy when text is needed.",
+    "Avoid cannabis dispensary visual language, neon lounge styling, heavy black packaging scenes, or loud sales graphics for Plant Bar.",
+    "Keep the composition airy, intentional, crafted, and mood-led, with logo use restrained and premium."
+  ]
+};
+
 export function createMockKlaviyoFields(input: CampaignInput) {
   const brand = getCampaignBrand(input.brandId);
   const product = input.products.split(",")[0]?.trim() || input.campaignName || brand.name;
@@ -111,7 +126,7 @@ export function createMockImageSet(
 ): GeneratedImage[] {
   const brand = getCampaignBrand(input.brandId);
   const productText = input.products || `selected ${brand.name} offerings`;
-  const brandGuidelines = brand.imageGuidelines.join(" ");
+  const brandGuidelines = brandImageGuidelines[brand.id].join(" ");
   const plantBarPalettes: Record<VisualConcept["name"], string[]> = {
     Product: ["#e5f5ef", "#ffa2a8", "#061f33", "#704f49", "#d9a45f"],
     Wellness: ["#e5f5ef", "#704f49", "#061f33", "#ffa2a8", "#f4efe6"],

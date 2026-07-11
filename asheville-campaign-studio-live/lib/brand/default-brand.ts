@@ -59,8 +59,8 @@ export const campaignBrands: Record<BrandId, CampaignBrand> = {
     sample: {
       campaignName: "SOHI Social Gummies Launch",
       fromName: "Asheville Dispensary",
-      fromEmail: "marketing@avldispensary.com",
-      replyToEmail: "marketing@avldispensary.com",
+      fromEmail: "no-reply@avldispensary.com",
+      replyToEmail: "support@avldispensary.com",
       subjectLine: "Buy 2 Get 1 on SOHI Social Gummies",
       previewText: "A relaxed edible campaign for discovering Pineapple Passionfruit and Black Cherry gummies.",
       products: "SOHI Social Gummies: Pineapple Passionfruit, Black Cherry",

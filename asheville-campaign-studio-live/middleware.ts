@@ -12,6 +12,7 @@ export async function middleware(request: NextRequest) {
     pathname === "/api/login" ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/brand-imagery") ||
+    pathname.startsWith("/brand-kit") ||
     pathname.startsWith("/logos") ||
     pathname.startsWith("/products") ||
     PUBLIC_FILE.test(pathname)
