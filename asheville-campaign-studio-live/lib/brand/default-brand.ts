@@ -16,8 +16,12 @@ export type CampaignBrand = {
   productEmpty: string;
   imagePromptBrand: string;
   logoPrompt: string;
+  imageGuidelines: string[];
   sample: {
     campaignName: string;
+    fromName: string;
+    fromEmail: string;
+    replyToEmail: string;
     subjectLine: string;
     previewText: string;
     products: string;
@@ -47,8 +51,16 @@ export const campaignBrands: Record<BrandId, CampaignBrand> = {
     productEmpty: "Start typing to pull matching Asheville Dispensary products.",
     imagePromptBrand: "Asheville Dispensary",
     logoPrompt: "Include the Asheville Dispensary logo as a tasteful brand mark integrated into the design.",
+    imageGuidelines: [
+      "Use a premium cannabis apothecary look with cream, black, deep green, and warm gold.",
+      "Keep product packaging readable, centered, and fully inside the image with generous margin.",
+      "Use natural shadows, restrained offer hierarchy, and product-forward composition."
+    ],
     sample: {
       campaignName: "SOHI Social Gummies Launch",
+      fromName: "Asheville Dispensary",
+      fromEmail: "marketing@avldispensary.com",
+      replyToEmail: "marketing@avldispensary.com",
       subjectLine: "Buy 2 Get 1 on SOHI Social Gummies",
       previewText: "A relaxed edible campaign for discovering Pineapple Passionfruit and Black Cherry gummies.",
       products: "SOHI Social Gummies: Pineapple Passionfruit, Black Cherry",
@@ -76,8 +88,18 @@ export const campaignBrands: Record<BrandId, CampaignBrand> = {
     productEmpty: "Start typing to pull matching Plant Bar offerings.",
     imagePromptBrand: "Plant Bar",
     logoPrompt: "Include the Plant Bar logo as a tasteful brand mark integrated into the design.",
+    imageGuidelines: [
+      "Honor the Plant Bar guide: soft mint backgrounds, blush pink brand energy, deep navy contrast, cocoa-brown warmth, and tea/coffee amber accents.",
+      "Use an editorial cafe and botanical beverage style: specialty coffee, tea, boba, zero-proof cocktails, glassware, garnish, texture, and warm human connection.",
+      "Typography direction should feel like bold Archivo for clear labels paired with refined Scotch-style editorial serif or warm hand-script energy when text is needed.",
+      "Avoid cannabis dispensary visual language, neon lounge styling, heavy black packaging scenes, or loud sales graphics for Plant Bar.",
+      "Keep the composition airy, intentional, crafted, and mood-led, with logo use restrained and premium."
+    ],
     sample: {
       campaignName: "Plant Bar Summer Seasonal",
+      fromName: "Plant Bar",
+      fromEmail: "hello@visitplantbar.com",
+      replyToEmail: "hello@visitplantbar.com",
       subjectLine: "Fresh summer pours at Plant Bar",
       previewText: "Honey, citrus, mint, hibiscus, and rose for the mood you are in.",
       products: "Summer Seasonal Menu, Botanical Zero-Proof Cocktails, Boba Tea",

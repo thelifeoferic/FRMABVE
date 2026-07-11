@@ -17,6 +17,7 @@ Tone: ${input.tone}
 Objective: ${input.objective}
 CTA: ${input.cta}
 Notes: ${input.notes}
+Brand image rules: ${brand.imageGuidelines.join(" ")}
 
 Return campaign strategy, headline, subheadline, supporting copy, sections, CTA,
 recommended layout, photography direction, color treatment, and visual hierarchy.`;

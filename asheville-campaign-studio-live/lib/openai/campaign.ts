@@ -111,6 +111,12 @@ export function createMockImageSet(
 ): GeneratedImage[] {
   const brand = getCampaignBrand(input.brandId);
   const productText = input.products || `selected ${brand.name} offerings`;
+  const brandGuidelines = brand.imageGuidelines.join(" ");
+  const plantBarPalettes: Record<VisualConcept["name"], string[]> = {
+    Product: ["#e5f5ef", "#ffa2a8", "#061f33", "#704f49", "#d9a45f"],
+    Wellness: ["#e5f5ef", "#704f49", "#061f33", "#ffa2a8", "#f4efe6"],
+    Lifestyle: ["#f4efe6", "#061f33", "#ffa2a8", "#704f49", "#d9a45f"]
+  };
   const assetRoles = Array.from(new Set(input.assets.map((asset) => asset.role)));
   const assetSummary = input.assets
     .map((asset) => {
@@ -129,7 +135,10 @@ export function createMockImageSet(
     { concept: concepts[2], version: "H", angle: "human discovery moment" }
   ];
 
-  return imagePlan.map(({ concept, version, angle }) => ({
+  return imagePlan.map(({ concept, version, angle }) => {
+    const palette = brand.id === "plant-bar" ? plantBarPalettes[concept.name] : concept.palette;
+
+    return {
       id: `${concept.id}-${version.toLowerCase()}`,
       style: concept.name as GeneratedImage["style"],
       version,
@@ -141,7 +150,8 @@ export function createMockImageSet(
         `Campaign headline: ${strategy.headline}.`,
         `Direction: ${concept.direction}`,
         `Layout: ${concept.layout}`,
-        `Use brand palette ${concept.palette.join(", ")}.`,
+        `Use brand palette ${palette.join(", ")}.`,
+        `Brand guide rules: ${brandGuidelines}`,
         input.includeLogo
           ? brand.logoPrompt
           : `Do not include the ${brand.name} logo in the generated image.`,
@@ -153,5 +163,6 @@ export function createMockImageSet(
       altText: `${concept.name} campaign image for ${productText}`,
       assetRoles: assetRoles.length ? assetRoles : ["brand", "product"],
       treatment: concept.treatment
-  }));
+    };
+  });
 }

@@ -23,6 +23,9 @@ function createSample(brand: CampaignBrand): CampaignInput {
   return {
   brandId: brand.id,
   campaignName: brand.sample.campaignName,
+  fromName: brand.sample.fromName,
+  fromEmail: brand.sample.fromEmail,
+  replyToEmail: brand.sample.replyToEmail,
   subjectLine: brand.sample.subjectLine,
   previewText: brand.sample.previewText,
   products: brand.sample.products,
@@ -159,43 +162,15 @@ export function PromptBox({
     if (!files) return;
 
     const pendingAssets = await Promise.all(Array.from(files).map(readAssetFile));
-    update("assets", [...assets, ...pendingAssets]);
+    const readyAssets = pendingAssets.map((asset) => ({
+      ...asset,
+      analysisStatus: "ready" as const,
+      summary:
+        asset.summary ??
+        `${asset.name} is attached as a reference. Use its visible packaging, colors, product cues, and composition direction.`
+    }));
 
-    const imageAssets = pendingAssets.filter((asset) => asset.dataUrl);
-
-    if (!imageAssets.length) return;
-
-    try {
-      const response = await fetch("/api/assets/analyze", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({
-          assets: imageAssets
-        })
-      });
-      const body = (await response.json()) as { assets?: CampaignAsset[] };
-      const analyzedAssets = body.assets ?? imageAssets;
-      const analyzedById = new Map(analyzedAssets.map((asset) => [asset.id, asset]));
-
-      onChange({
-        ...value,
-        assets: [...assets, ...pendingAssets.map((asset) => analyzedById.get(asset.id) ?? asset)]
-      });
-    } catch {
-      onChange({
-        ...value,
-        assets: [
-          ...assets,
-          ...pendingAssets.map((asset) => ({
-            ...asset,
-            analysisStatus: asset.dataUrl ? "failed" : asset.analysisStatus,
-            summary: asset.summary ?? "Attached image could not be analyzed, but its preview remains available."
-          }))
-        ]
-      });
-    }
+    update("assets", [...assets, ...readyAssets]);
   }
 
   function updateAssetRole(assetId: string, role: CampaignAsset["role"]) {
@@ -260,10 +235,37 @@ export function PromptBox({
       <div className="klaviyo-fields">
         <div className="section-heading compact-heading">
           <p>Klaviyo Fields</p>
-          <button className="ghost-button" type="button" onClick={onGenerateFields}>
-            AI generate
-          </button>
+          <span>Draft fields v2</span>
         </div>
+        <button className="ghost-button" type="button" onClick={onGenerateFields}>
+          AI generate
+        </button>
+        <div className="brief-meta">
+          <label>
+            From name
+            <input
+              value={value.fromName}
+              onChange={(event) => update("fromName", event.target.value)}
+              placeholder={brand.sample.fromName}
+            />
+          </label>
+          <label>
+            From email
+            <input
+              value={value.fromEmail}
+              onChange={(event) => update("fromEmail", event.target.value)}
+              placeholder={brand.sample.fromEmail}
+            />
+          </label>
+        </div>
+        <label>
+          Reply-to email
+          <input
+            value={value.replyToEmail}
+            onChange={(event) => update("replyToEmail", event.target.value)}
+            placeholder={brand.sample.replyToEmail}
+          />
+        </label>
         <label>
           Subject line
           <input

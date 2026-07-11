@@ -22,6 +22,9 @@ import type { RefObject } from "react";
 const initialInput: CampaignInput = {
   brandId: "asheville-dispensary",
   campaignName: "",
+  fromName: "",
+  fromEmail: "",
+  replyToEmail: "",
   subjectLine: "",
   previewText: "",
   products: "",
@@ -40,7 +43,8 @@ const initialInput: CampaignInput = {
 };
 
 const steps = ["Brief", "Klaviyo Fields", "Images", "Review", "Klaviyo Draft"];
-const similarVariants: GeneratedImage["version"][] = ["A", "B", "C", "D", "E", "F", "G", "H"];
+const economyImageCount = 3;
+const similarVariants: GeneratedImage["version"][] = ["A", "B", "C"];
 
 export function CampaignStudio() {
   const [input, setInput] = useState<CampaignInput>(initialInput);
@@ -114,6 +118,9 @@ export function CampaignStudio() {
     setInput((current) => ({
       ...current,
       brandId,
+      fromName: nextBrand.sample.fromName,
+      fromEmail: nextBrand.sample.fromEmail,
+      replyToEmail: nextBrand.sample.replyToEmail,
       products: "",
       productIds: [],
       assets: [],
@@ -138,6 +145,9 @@ export function CampaignStudio() {
     const nextFields = createMockKlaviyoFields(input);
     const nextInput = {
       ...input,
+      fromName: input.fromName || selectedBrand.sample.fromName,
+      fromEmail: input.fromEmail || selectedBrand.sample.fromEmail,
+      replyToEmail: input.replyToEmail || selectedBrand.sample.replyToEmail,
       subjectLine: input.subjectLine || nextFields.subjectLine,
       previewText: input.previewText || nextFields.previewText
     };
@@ -179,7 +189,7 @@ export function CampaignStudio() {
   }
 
   async function createDraft() {
-    if (!strategy || !selectedConcept || !selectedImage?.imageUrl) return;
+    if (!strategy || !selectedConcept) return;
     setDrafting(true);
     const response = await fetch("/api/klaviyo/draft", {
       method: "POST",
@@ -190,7 +200,7 @@ export function CampaignStudio() {
         input,
         strategy,
         concept: selectedConcept,
-        generatedImages: [selectedImage]
+        generatedImages: selectedImage ? [selectedImage] : []
       })
     });
     const body = (await response.json()) as { draft: KlaviyoDraft };
@@ -225,8 +235,10 @@ export function CampaignStudio() {
   async function generateImages() {
     if (!generatedImages.length) return;
 
+    const imagesToGenerate = generatedImages.slice(0, economyImageCount);
+
     setGeneratingImages(true);
-    setGeneratedImages((current) => current.map((image) => ({ ...image, status: "generating" })));
+    setGeneratedImages(imagesToGenerate.map((image) => ({ ...image, status: "generating" })));
 
     const response = await fetch("/api/images/generate", {
       method: "POST",
@@ -234,7 +246,7 @@ export function CampaignStudio() {
         "content-type": "application/json"
       },
       body: JSON.stringify({
-        images: generatedImages
+        images: imagesToGenerate
       })
     });
     const body = (await response.json()) as { images?: GeneratedImage[] };
@@ -259,7 +271,7 @@ export function CampaignStudio() {
     const similarBriefs: GeneratedImage[] = similarVariants.map((variant) => ({
       ...sourceImage,
       id: `${sourceImage.id}-similar-${variant.toLowerCase()}-${Date.now()}`,
-      version: variant === "A" ? "A" : "B",
+      version: variant,
       status: "brief-ready",
       imageUrl: undefined,
       error: undefined,

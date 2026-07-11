@@ -34,7 +34,7 @@ async function generateImage(image: GeneratedImage): Promise<GeneratedImage> {
       "content-type": "application/json"
     },
     body: JSON.stringify({
-      model: "gpt-image-1",
+      model: process.env.OPENAI_IMAGE_MODEL ?? "gpt-image-1-mini",
       prompt: image.prompt,
       size: "1024x1024",
       n: 1
