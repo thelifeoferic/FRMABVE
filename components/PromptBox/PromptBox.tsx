@@ -159,43 +159,15 @@ export function PromptBox({
     if (!files) return;
 
     const pendingAssets = await Promise.all(Array.from(files).map(readAssetFile));
-    update("assets", [...assets, ...pendingAssets]);
+    const readyAssets = pendingAssets.map((asset) => ({
+      ...asset,
+      analysisStatus: "ready" as const,
+      summary:
+        asset.summary ??
+        `${asset.name} is attached as a reference. Use its visible packaging, colors, product cues, and composition direction.`
+    }));
 
-    const imageAssets = pendingAssets.filter((asset) => asset.dataUrl);
-
-    if (!imageAssets.length) return;
-
-    try {
-      const response = await fetch("/api/assets/analyze", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json"
-        },
-        body: JSON.stringify({
-          assets: imageAssets
-        })
-      });
-      const body = (await response.json()) as { assets?: CampaignAsset[] };
-      const analyzedAssets = body.assets ?? imageAssets;
-      const analyzedById = new Map(analyzedAssets.map((asset) => [asset.id, asset]));
-
-      onChange({
-        ...value,
-        assets: [...assets, ...pendingAssets.map((asset) => analyzedById.get(asset.id) ?? asset)]
-      });
-    } catch {
-      onChange({
-        ...value,
-        assets: [
-          ...assets,
-          ...pendingAssets.map((asset) => ({
-            ...asset,
-            analysisStatus: asset.dataUrl ? "failed" : asset.analysisStatus,
-            summary: asset.summary ?? "Attached image could not be analyzed, but its preview remains available."
-          }))
-        ]
-      });
-    }
+    update("assets", [...assets, ...readyAssets]);
   }
 
   function updateAssetRole(assetId: string, role: CampaignAsset["role"]) {

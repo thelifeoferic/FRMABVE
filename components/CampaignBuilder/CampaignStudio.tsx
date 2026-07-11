@@ -40,7 +40,8 @@ const initialInput: CampaignInput = {
 };
 
 const steps = ["Brief", "Klaviyo Fields", "Images", "Review", "Klaviyo Draft"];
-const similarVariants: GeneratedImage["version"][] = ["A", "B", "C", "D", "E", "F", "G", "H"];
+const economyImageCount = 2;
+const similarVariants: GeneratedImage["version"][] = ["A", "B"];
 
 export function CampaignStudio() {
   const [input, setInput] = useState<CampaignInput>(initialInput);
@@ -225,8 +226,10 @@ export function CampaignStudio() {
   async function generateImages() {
     if (!generatedImages.length) return;
 
+    const imagesToGenerate = generatedImages.slice(0, economyImageCount);
+
     setGeneratingImages(true);
-    setGeneratedImages((current) => current.map((image) => ({ ...image, status: "generating" })));
+    setGeneratedImages(imagesToGenerate.map((image) => ({ ...image, status: "generating" })));
 
     const response = await fetch("/api/images/generate", {
       method: "POST",
@@ -234,7 +237,7 @@ export function CampaignStudio() {
         "content-type": "application/json"
       },
       body: JSON.stringify({
-        images: generatedImages
+        images: imagesToGenerate
       })
     });
     const body = (await response.json()) as { images?: GeneratedImage[] };

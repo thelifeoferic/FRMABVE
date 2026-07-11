@@ -67,7 +67,7 @@ export function ImageSetPanel({
           <p>{images.length ? "Image briefs are ready." : "Generate the campaign package first."}</p>
           <span>
             {images.length
-              ? "Generate eight image options, then pick the one that should move into the Klaviyo draft."
+              ? "Generate two draft image options first. Create more only after a direction is worth exploring."
               : "No image thumbnails will appear here until image generation returns results."}
           </span>
           {failedImages.length ? <small>{failedImages.length} image request failed. Regenerate when ready.</small> : null}
@@ -77,11 +77,11 @@ export function ImageSetPanel({
       {images.length ? (
         <div className="image-actions">
           <button className="primary-button image-generate-button" disabled={generating} onClick={onGenerateImages}>
-            {generating ? "Generating 8 Images..." : generatedImages.length ? "Regenerate 8 Image Options" : "Generate 8 Images with OpenAI"}
+            {generating ? "Generating 2 Draft Images..." : generatedImages.length ? "Regenerate 2 Draft Images" : "Generate 2 Draft Images"}
           </button>
           {generatedImages.length ? (
             <button className="ghost-button image-generate-button" disabled={generating || !canGenerateSimilar} onClick={onGenerateSimilar}>
-              More Like Selected
+              Generate 2 More Like Selected
             </button>
           ) : null}
         </div>
