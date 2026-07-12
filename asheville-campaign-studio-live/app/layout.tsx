@@ -13,7 +13,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <footer className="site-footer">frm.abve &copy; 2026</footer>
+      </body>
     </html>
   );
 }

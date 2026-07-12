@@ -331,12 +331,6 @@ export function CampaignStudio() {
           </div>
           <h1>Campaign Studio</h1>
           <p>{selectedBrand.promise}</p>
-          <div className="hero-stats" aria-label="Workflow summary">
-            <span>Audience</span>
-            <span>Products</span>
-            <span>Creative</span>
-            <span>Draft</span>
-          </div>
         </div>
       </header>
 

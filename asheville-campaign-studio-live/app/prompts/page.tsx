@@ -118,7 +118,14 @@ The design should feel premium but approachable: specialty coffee, tea, boba, ze
   }
 ];
 
-export default function PromptsPage() {
+type PromptsPageProps = {
+  searchParams: Promise<{ brand?: string }>;
+};
+
+export default async function PromptsPage({ searchParams }: PromptsPageProps) {
+  const params = await searchParams;
+  const activeGroup = promptGroups.find((group) => group.id === params.brand) ?? promptGroups[0];
+
   return (
     <main className="settings-page prompts-page">
       <section className="panel brand-kit-hero prompts-hero">
@@ -142,52 +149,50 @@ export default function PromptsPage() {
 
       <nav className="prompt-tabs" aria-label="Prompt categories">
         {promptGroups.map((group) => (
-          <a href={`#${group.id}`} key={group.id}>
+          <a className={group.id === activeGroup.id ? "active" : ""} href={`/prompts?brand=${group.id}`} key={group.id}>
             {group.label}
           </a>
         ))}
       </nav>
 
-      {promptGroups.map((group) => (
-        <section className="prompt-library-section" id={group.id} key={group.id}>
-          <div className="section-heading">
-            <p>{group.label}</p>
-            <span>{group.prompts.length} saved prompts</span>
-          </div>
+      <section className="prompt-library-section" id={activeGroup.id}>
+        <div className="section-heading">
+          <p>{activeGroup.label}</p>
+          <span>{activeGroup.prompts.length} saved prompts</span>
+        </div>
 
-          <div className="prompt-library-list">
-            {group.prompts.map((prompt) => (
-              <details className="panel prompt-library-card" key={prompt.title}>
-                <summary>
-                  <span>
-                    <strong>{prompt.title}</strong>
-                    <em>{prompt.summary}</em>
-                  </span>
-                  <small>{prompt.type}</small>
-                </summary>
+        <div className="prompt-library-list">
+          {activeGroup.prompts.map((prompt) => (
+            <details className="panel prompt-library-card" key={prompt.title}>
+              <summary>
+                <span>
+                  <strong>{prompt.title}</strong>
+                  <em>{prompt.summary}</em>
+                </span>
+                <small>{prompt.type}</small>
+              </summary>
 
-                <div className="prompt-library-body">
-                  <div className="prompt-rule-chips">
-                    {prompt.rules.map((rule) => (
-                      <span key={rule}>{rule}</span>
-                    ))}
-                  </div>
-
-                  <pre>
-                    <code>{prompt.code}</code>
-                  </pre>
-
-                  {prompt.download ? (
-                    <a className="prompt-download" href={prompt.download} download>
-                      Download saved prompt
-                    </a>
-                  ) : null}
+              <div className="prompt-library-body">
+                <div className="prompt-rule-chips">
+                  {prompt.rules.map((rule) => (
+                    <span key={rule}>{rule}</span>
+                  ))}
                 </div>
-              </details>
-            ))}
-          </div>
-        </section>
-      ))}
+
+                <pre>
+                  <code>{prompt.code}</code>
+                </pre>
+
+                {prompt.download ? (
+                  <a className="prompt-download" href={prompt.download} download>
+                    Download saved prompt
+                  </a>
+                ) : null}
+              </div>
+            </details>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
