@@ -8,11 +8,10 @@ export default async function LoginPage({
 
   return (
     <main className="lock-screen">
-      <section className="lock-card" aria-label="From Above login">
-        <div className="lock-mark">FROM ABOVE</div>
-        <p className="lock-eyebrow">Campaign Studio</p>
-        <h1>Locked workspace</h1>
-        <p className="lock-copy">Sign in to build draft campaigns for Asheville Dispensary and connected brands.</p>
+      <section className="lock-card" aria-label="FRM ABVE login">
+        <div className="lock-mark">FRM ABVE</div>
+        <h1>FRM ABVE login</h1>
+        <p className="lock-copy">Private campaign workspace.</p>
 
         <form className="lock-form" method="post" action="/api/login">
           <label>

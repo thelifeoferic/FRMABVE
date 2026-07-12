@@ -319,7 +319,7 @@ export function CampaignStudio() {
         <div className="hero-copy">
           <div className="brand-selector" aria-label="Brand selector">
             <label>
-              Brand
+              <span className="sr-only">Choose brand</span>
               <select aria-label="Brand" value={input.brandId} onChange={(event) => selectBrand(event.target.value as BrandId)}>
                 {Object.values(campaignBrands).map((brand) => (
                   <option key={brand.id} value={brand.id}>
@@ -329,7 +329,6 @@ export function CampaignStudio() {
               </select>
             </label>
           </div>
-          <p className="eyebrow">{selectedBrand.name}</p>
           <h1>Campaign Studio</h1>
           <p>{selectedBrand.promise}</p>
           <div className="hero-stats" aria-label="Workflow summary">
