@@ -1404,6 +1404,15 @@ dd {
   line-height: 0.98;
 }
 
+.brand-kit-page[data-brand="plant-bar"] .brand-kit-hero h1,
+.prompts-page[data-brand="plant-bar"] .brand-kit-hero h1 {
+  max-width: 800px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: 0;
+  line-height: 1.03;
+}
+
 .brand-kit-hero p {
   max-width: 680px;
   color: var(--muted);
@@ -1494,6 +1503,68 @@ dd {
   text-align: center;
 }
 
+.plant-bar-cta-preview {
+  min-height: 420px;
+  justify-items: start;
+  background: #f4efe6;
+}
+
+.plant-bar-menu-card {
+  display: grid;
+  gap: 16px;
+  max-width: 620px;
+  padding: 26px 8px;
+}
+
+.plant-bar-menu-card small {
+  color: #ffa2a8;
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.plant-bar-menu-card strong {
+  color: #061f33;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(38px, 5vw, 68px);
+  font-weight: 500;
+  line-height: 0.95;
+}
+
+.plant-bar-menu-card em {
+  color: #704f49;
+  font-family: "Comic Sans MS", "Bradley Hand", cursive;
+  font-size: clamp(26px, 3.8vw, 42px);
+  font-style: normal;
+  line-height: 1.05;
+}
+
+.plant-bar-menu-card p {
+  margin: 0;
+  color: #4f5c68;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(18px, 2.2vw, 28px);
+  line-height: 1.25;
+}
+
+.plant-bar-menu-card span {
+  display: grid;
+  place-items: center;
+  width: min(554px, 100%);
+  min-height: 92px;
+  border-radius: 999px;
+  background: #061f33;
+  color: #ffffff;
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(16px, 2vw, 24px);
+  font-weight: 760;
+  letter-spacing: 0.16em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
 .cta-spec-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1553,8 +1624,8 @@ dd {
   place-items: center;
   border: 1px solid var(--action-bg);
   border-radius: 3px;
-  background: var(--action-bg);
-  color: var(--action-text);
+  background: #fffdf8;
+  color: var(--action-bg);
   font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: 13px;
   font-weight: 760;
@@ -1563,8 +1634,21 @@ dd {
 }
 
 .prompt-tabs a.active {
+  background: var(--action-bg);
+  color: var(--action-text);
+}
+
+.brand-kit-page[data-brand="plant-bar"] .prompt-tabs a,
+.prompts-page[data-brand="plant-bar"] .prompt-tabs a {
+  border-color: #061f33;
   background: #fffdf8;
-  color: var(--action-bg);
+  color: #061f33;
+}
+
+.brand-kit-page[data-brand="plant-bar"] .prompt-tabs a.active,
+.prompts-page[data-brand="plant-bar"] .prompt-tabs a.active {
+  background: #061f33;
+  color: #fffdf8;
 }
 
 .brand-tabs {
@@ -1779,6 +1863,32 @@ dd {
   gap: 22px;
 }
 
+.brand-kit-card-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.7fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.brand-kit-primary-column,
+.brand-kit-download-column {
+  display: grid;
+  gap: 22px;
+}
+
+.brand-kit-download-column {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(244, 239, 230, 0.45);
+  padding: 18px;
+}
+
+.brand-kit-download-column p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.42;
+}
+
 .brand-kit-card-header {
   display: grid;
   grid-template-columns: 112px minmax(0, 1fr);
@@ -1887,12 +1997,20 @@ dd {
   color: var(--action-text);
 }
 
+.brand-kit-page[data-brand="plant-bar"] .brand-download-list a {
+  background: #061f33;
+}
+
 @media (max-width: 1050px) {
   .workspace {
     grid-template-columns: 1fr;
   }
 
   .brand-kit-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-kit-card-grid {
     grid-template-columns: 1fr;
   }
 

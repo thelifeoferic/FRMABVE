@@ -127,7 +127,7 @@ export default async function PromptsPage({ searchParams }: PromptsPageProps) {
   const activeGroup = promptGroups.find((group) => group.id === params.brand) ?? promptGroups[0];
 
   return (
-    <main className="settings-page prompts-page">
+    <main className="settings-page prompts-page" data-brand={activeGroup.id}>
       <section className="panel brand-kit-hero prompts-hero">
         <div className="section-heading">
           <p>AI Prompts</p>
@@ -141,7 +141,7 @@ export default async function PromptsPage({ searchParams }: PromptsPageProps) {
           <a className="ghost-link" href="/">
             Back to Campaign Studio
           </a>
-          <a className="ghost-link" href="/settings">
+          <a className="ghost-link" href={`/settings?brand=${activeGroup.id}`}>
             Brand Kit
           </a>
         </div>

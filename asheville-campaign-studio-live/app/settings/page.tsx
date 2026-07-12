@@ -71,6 +71,21 @@ const ctaButtonSpecs = [
   ["Effects", "No shadow, no outline"]
 ];
 
+const plantBarCtaButtonSpecs = [
+  ["Canvas", "878 x 930 px"],
+  ["Background", "#f4efe6 cream"],
+  ["Button size", "554 x 92 px"],
+  ["Button fill", "#061f33"],
+  ["Corner radius", "999 px"],
+  ["Text", "Clean sans, Bold"],
+  ["Text size", "22-26 px"],
+  ["Text color", "#ffffff"],
+  ["Letter spacing", "12-16% in Canva"],
+  ["Alignment", "Center text horizontally and vertically"],
+  ["Accent", "Right arrow at end of CTA"],
+  ["Effects", "No shadow, no outline"]
+];
+
 type SettingsPageProps = {
   searchParams: Promise<{ brand?: string }>;
 };
@@ -79,9 +94,10 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   const params = await searchParams;
   const activeBrand = brandKits.find((brand) => brand.id === params.brand) ?? brandKits[0];
   const isAsheville = activeBrand.id === "asheville";
+  const currentCtaSpecs = isAsheville ? ctaButtonSpecs : plantBarCtaButtonSpecs;
 
   return (
-    <main className="settings-page brand-kit-page">
+    <main className="settings-page brand-kit-page" data-brand={activeBrand.id}>
       <section className="panel brand-kit-hero">
         <div className="section-heading">
           <p>Brand Kit</p>
@@ -109,17 +125,26 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         ))}
       </nav>
 
-      {isAsheville ? (
-        <section className="panel cta-spec-card" aria-label="Asheville CTA button specs">
+      <section className="panel cta-spec-card" aria-label={`${activeBrand.name} CTA button specs`}>
           <div className="section-heading">
             <p>CTA Button Specs</p>
             <span>Canva-ready</span>
           </div>
-          <div className="cta-spec-preview" aria-label="CTA button preview">
-            <span>Shop All THCA Flower</span>
+          <div className={isAsheville ? "cta-spec-preview" : "cta-spec-preview plant-bar-cta-preview"} aria-label="CTA button preview">
+            {isAsheville ? (
+              <span>Shop All THCA Flower</span>
+            ) : (
+              <div className="plant-bar-menu-card">
+                <small>Now Pouring · Summer 2026</small>
+                <strong>Summer Seasonal Menu</strong>
+                <em>Honey, citrus, mint, hibiscus & rose.</em>
+                <p>Fresh Flavors • Summer Mood • Sunny Days</p>
+                <span>See The Seasonal Menu →</span>
+              </div>
+            )}
           </div>
           <div className="cta-spec-grid">
-            {ctaButtonSpecs.map(([label, value]) => (
+            {currentCtaSpecs.map(([label, value]) => (
               <div className="cta-spec-row" key={label}>
                 <strong>{label}</strong>
                 <span>{value}</span>
@@ -127,54 +152,60 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
             ))}
           </div>
         </section>
-      ) : null}
 
       <section className="brand-kit-grid" aria-label="Downloadable brand assets">
         <article className="panel brand-kit-card" key={activeBrand.name}>
-          <div className="brand-kit-card-header">
-            <img src={activeBrand.logo} alt={`${activeBrand.name} logo`} />
-            <div>
-              <p>{activeBrand.name}</p>
-              <span>{activeBrand.description}</span>
-            </div>
-          </div>
-
-          <div className="brand-kit-section">
-            <h2>Colors</h2>
-            <div className="brand-color-grid">
-              {activeBrand.colors.map(([name, color]) => (
-                <div className="brand-color-chip" key={color}>
-                  <span style={{ backgroundColor: color }} />
-                  <strong>{name}</strong>
-                  <code>{color}</code>
+          <div className="brand-kit-card-grid">
+            <div className="brand-kit-primary-column">
+              <div className="brand-kit-card-header">
+                <img src={activeBrand.logo} alt={`${activeBrand.name} logo`} />
+                <div>
+                  <p>{activeBrand.name}</p>
+                  <span>{activeBrand.description}</span>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div className="brand-kit-section">
-            <h2>Fonts</h2>
-            <div className="brand-font-list">
-              {activeBrand.fonts.map(([label, href]) => (
-                href ? (
-                  <a href={href} download key={href}>
-                    {label}
-                  </a>
-                ) : (
-                  <span key={label}>{label}</span>
-                )
-              ))}
-            </div>
-          </div>
+              <div className="brand-kit-section">
+                <h2>Colors</h2>
+                <div className="brand-color-grid">
+                  {activeBrand.colors.map(([name, color]) => (
+                    <div className="brand-color-chip" key={color}>
+                      <span style={{ backgroundColor: color }} />
+                      <strong>{name}</strong>
+                      <code>{color}</code>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
-          <div className="brand-kit-section">
-            <h2>Downloads</h2>
-            <div className="brand-download-list">
-              {activeBrand.downloads.map(([label, href]) => (
-                <a href={href} download key={href}>
-                  {label}
-                </a>
-              ))}
+              <div className="brand-kit-section">
+                <h2>Fonts</h2>
+                <div className="brand-font-list">
+                  {activeBrand.fonts.map(([label, href]) => (
+                    href ? (
+                      <a href={href} download key={href}>
+                        {label}
+                      </a>
+                    ) : (
+                      <span key={label}>{label}</span>
+                    )
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="brand-kit-download-column">
+              <div className="brand-kit-section">
+                <h2>Downloads</h2>
+                <p>Quick access to logos, brand notes, prompt files, and source assets for this brand.</p>
+                <div className="brand-download-list">
+                  {activeBrand.downloads.map(([label, href]) => (
+                    <a href={href} download key={href}>
+                      {label}
+                    </a>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </article>
