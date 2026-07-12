@@ -137,7 +137,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               <span>Above the fold</span>
             </div>
             <div className="brand-download-list">
-              {activeBrand.downloads.slice(0, 5).map(([label, href]) => (
+              {activeBrand.downloads.map(([label, href]) => (
                 <a href={href} download key={href}>
                   {label}
                 </a>
@@ -225,20 +225,6 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                       <strong>{label}</strong>
                       <span>{rule}</span>
                     </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="brand-kit-download-column">
-              <div className="brand-kit-section">
-                <h2>Downloads</h2>
-                <p>Quick access to logos, brand notes, prompt files, and source assets for this brand.</p>
-                <div className="brand-download-list">
-                  {activeBrand.downloads.map(([label, href]) => (
-                    <a href={href} download key={href}>
-                      {label}
-                    </a>
                   ))}
                 </div>
               </div>

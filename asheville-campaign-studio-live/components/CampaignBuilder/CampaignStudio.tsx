@@ -345,10 +345,10 @@ export function CampaignStudio() {
             {step}
           </button>
         ))}
-        <a className="stepper-link" href="/settings">
+        <a className="stepper-link" href={`/settings?brand=${selectedBrand.id === "asheville-dispensary" ? "asheville" : "plant-bar"}`}>
           Brand Kit
         </a>
-        <a className="stepper-link" href="/prompts">
+        <a className="stepper-link" href={`/prompts?brand=${selectedBrand.id === "asheville-dispensary" ? "asheville" : "plant-bar"}`}>
           AI Prompts
         </a>
       </nav>
