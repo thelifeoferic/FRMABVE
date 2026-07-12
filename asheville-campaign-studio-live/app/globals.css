@@ -291,7 +291,12 @@ button {
   font-size: 16px;
   font-weight: 900;
   text-align: center;
+  text-align-last: center;
   box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+}
+
+.brand-selector option {
+  text-align: center;
 }
 
 h1,
@@ -2090,6 +2095,20 @@ dd {
     padding: 0 0 28px;
   }
 
+  .topbar {
+    margin-bottom: 0;
+  }
+
+  .brand-selector {
+    width: min(340px, calc(100vw - 64px));
+  }
+
+  .brand-selector select {
+    padding: 0 46px;
+    text-align: center;
+    text-align-last: center;
+  }
+
   .topbar > .hero-brand-logo {
     inset: 22px auto auto 50%;
     width: 92px;
@@ -2109,13 +2128,13 @@ dd {
     z-index: 5;
     display: flex;
     flex-wrap: nowrap;
-    gap: 8px;
-    margin-bottom: 18px;
+    gap: 18px;
+    margin-bottom: 14px;
     overflow-x: auto;
-    padding: 12px 16px;
-    background: rgba(244, 239, 230, 0.96);
-    border-bottom: 1px solid rgba(38, 62, 34, 0.14);
-    box-shadow: 0 14px 24px rgba(30, 28, 22, 0.08);
+    padding: 14px 18px 12px;
+    background: #fffdf8;
+    border-bottom: 1px solid rgba(38, 62, 34, 0.1);
+    box-shadow: none;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
@@ -2128,12 +2147,22 @@ dd {
   .stepper-link {
     flex: 0 0 auto;
     min-width: auto;
-    min-height: 38px;
-    border-radius: 999px;
-    padding: 8px 14px;
-    font-size: 12px;
-    letter-spacing: 0.02em;
+    min-height: 30px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: var(--action-bg);
+    padding: 4px 0;
+    font-size: 13px;
+    letter-spacing: 0.01em;
     white-space: nowrap;
+  }
+
+  .stepper button.active {
+    background: transparent;
+    border-color: var(--ink);
+    color: var(--ink);
   }
 
   .stepper-link {
