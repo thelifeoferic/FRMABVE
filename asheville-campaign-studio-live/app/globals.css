@@ -1396,6 +1396,13 @@ dd {
   gap: 10px;
 }
 
+.brand-kit-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.42fr);
+  gap: 28px;
+  align-items: start;
+}
+
 .brand-kit-hero h1 {
   max-width: 760px;
   font-family: "Iskra W01", Inter, ui-sans-serif, system-ui, sans-serif;
@@ -1418,6 +1425,20 @@ dd {
   color: var(--muted);
   font-size: 17px;
   line-height: 1.45;
+}
+
+.brand-kit-quick-downloads {
+  display: grid;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(244, 239, 230, 0.48);
+  padding: 16px;
+}
+
+.brand-kit-quick-downloads .brand-download-list {
+  display: grid;
+  grid-template-columns: 1fr;
 }
 
 .settings-actions {
@@ -1504,52 +1525,12 @@ dd {
 }
 
 .plant-bar-cta-preview {
-  min-height: 420px;
-  justify-items: start;
+  min-height: 190px;
+  place-items: center;
   background: #f4efe6;
 }
 
-.plant-bar-menu-card {
-  display: grid;
-  gap: 16px;
-  max-width: 620px;
-  padding: 26px 8px;
-}
-
-.plant-bar-menu-card small {
-  color: #ffa2a8;
-  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: 13px;
-  font-weight: 850;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.plant-bar-menu-card strong {
-  color: #061f33;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(38px, 5vw, 68px);
-  font-weight: 500;
-  line-height: 0.95;
-}
-
-.plant-bar-menu-card em {
-  color: #704f49;
-  font-family: "Comic Sans MS", "Bradley Hand", cursive;
-  font-size: clamp(26px, 3.8vw, 42px);
-  font-style: normal;
-  line-height: 1.05;
-}
-
-.plant-bar-menu-card p {
-  margin: 0;
-  color: #4f5c68;
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(18px, 2.2vw, 28px);
-  line-height: 1.25;
-}
-
-.plant-bar-menu-card span {
+.plant-bar-cta-preview span {
   display: grid;
   place-items: center;
   width: min(554px, 100%);
@@ -1631,6 +1612,7 @@ dd {
   font-weight: 760;
   letter-spacing: 0.04em;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .prompt-tabs a.active {
@@ -1656,6 +1638,11 @@ dd {
   padding: 0;
   background: transparent;
   backdrop-filter: none;
+}
+
+.brand-tabs a {
+  min-width: 220px;
+  padding: 0 20px;
 }
 
 .prompt-library-section {
@@ -1987,6 +1974,39 @@ dd {
   text-decoration: none;
 }
 
+.brand-font-rules {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.brand-font-rule {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fffdf8;
+  padding: 12px;
+}
+
+.brand-font-rule strong {
+  color: var(--brand-green);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.brand-font-rule span {
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.brand-kit-page[data-brand="plant-bar"] .brand-font-rule strong,
+.brand-kit-page[data-brand="plant-bar"] .cta-spec-row strong {
+  color: #061f33;
+}
+
 .brand-font-list a {
   border-color: rgba(49, 95, 52, 0.32);
   color: var(--action-bg);
@@ -2011,6 +2031,10 @@ dd {
   }
 
   .brand-kit-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-kit-hero-grid {
     grid-template-columns: 1fr;
   }
 

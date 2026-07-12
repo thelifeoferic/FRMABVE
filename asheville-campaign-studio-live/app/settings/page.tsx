@@ -11,6 +11,12 @@ const brandKits = [
       ["Montserrat", "/brand-kit/asheville-dispensary/fonts/montserrat-variable.ttf"],
       ["Montserrat Italic", "/brand-kit/asheville-dispensary/fonts/montserrat-italic-variable.ttf"]
     ],
+    fontRules: [
+      ["Display headings", "Use Iskra Bold or Medium for short campaign headlines and major page titles."],
+      ["Body copy", "Use Montserrat Regular or Medium for paragraphs, product details, labels, and practical campaign copy."],
+      ["CTA buttons", "Use Montserrat SemiBold or Bold, centered, with modest letter spacing."],
+      ["Restraint", "Avoid mixing extra decorative fonts into Asheville email or campaign layouts."]
+    ],
     colors: [
       ["Cream", "#f8f4ec"],
       ["Black", "#171717"],
@@ -38,6 +44,12 @@ const brandKits = [
       ["Archivo-style sans", ""],
       ["Scotch-style editorial serif", ""],
       ["Warm script accent", ""]
+    ],
+    fontRules: [
+      ["Editorial titles", "Use the Plant Bar serif for menu headlines, seasonal titles, and slower editorial moments."],
+      ["Body copy", "Use the clean sans for descriptions, navigation, product notes, and readable campaign copy."],
+      ["Accent script", "Use the handwritten script sparingly for flavor lines or mood statements, never for long text."],
+      ["CTA buttons", "Use uppercase sans, wide tracking, white text, and the deep navy rounded pill."]
     ],
     colors: [
       ["Mint", "#e5f5ef"],
@@ -72,7 +84,7 @@ const ctaButtonSpecs = [
 ];
 
 const plantBarCtaButtonSpecs = [
-  ["Canvas", "878 x 930 px"],
+  ["Canvas", "878 x 230 px"],
   ["Background", "#f4efe6 cream"],
   ["Button size", "554 x 92 px"],
   ["Button fill", "#061f33"],
@@ -99,21 +111,39 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   return (
     <main className="settings-page brand-kit-page" data-brand={activeBrand.id}>
       <section className="panel brand-kit-hero">
-        <div className="section-heading">
-          <p>Brand Kit</p>
-          <span>Download center</span>
-        </div>
-        <h1>Brand assets, fonts, colors, and guidelines.</h1>
-        <p>
-          Keep the campaign studio and the final creative working from the same source of truth.
-        </p>
-        <div className="settings-actions">
-          <a className="ghost-link" href="/">
-            Back to Campaign Studio
-          </a>
-          <a className="ghost-link" href={`/prompts?brand=${activeBrand.id}`}>
-            Open AI Prompts
-          </a>
+        <div className="brand-kit-hero-grid">
+          <div>
+            <div className="section-heading">
+              <p>Brand Kit</p>
+              <span>{activeBrand.name}</span>
+            </div>
+            <h1>Brand assets, fonts, colors, and guidelines.</h1>
+            <p>
+              Keep the campaign studio and the final creative working from the same source of truth.
+            </p>
+            <div className="settings-actions">
+              <a className="ghost-link" href="/">
+                Back to Campaign Studio
+              </a>
+              <a className="ghost-link" href={`/prompts?brand=${activeBrand.id}`}>
+                Open AI Prompts
+              </a>
+            </div>
+          </div>
+
+          <aside className="brand-kit-quick-downloads" aria-label={`${activeBrand.name} quick downloads`}>
+            <div className="section-heading">
+              <p>Downloads</p>
+              <span>Above the fold</span>
+            </div>
+            <div className="brand-download-list">
+              {activeBrand.downloads.slice(0, 5).map(([label, href]) => (
+                <a href={href} download key={href}>
+                  {label}
+                </a>
+              ))}
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -134,13 +164,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
             {isAsheville ? (
               <span>Shop All THCA Flower</span>
             ) : (
-              <div className="plant-bar-menu-card">
-                <small>Now Pouring · Summer 2026</small>
-                <strong>Summer Seasonal Menu</strong>
-                <em>Honey, citrus, mint, hibiscus & rose.</em>
-                <p>Fresh Flavors • Summer Mood • Sunny Days</p>
-                <span>See The Seasonal Menu →</span>
-              </div>
+              <span>See The Seasonal Menu →</span>
             )}
           </div>
           <div className="cta-spec-grid">
@@ -189,6 +213,18 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                     ) : (
                       <span key={label}>{label}</span>
                     )
+                  ))}
+                </div>
+              </div>
+
+              <div className="brand-kit-section">
+                <h2>Font rules</h2>
+                <div className="brand-font-rules">
+                  {activeBrand.fontRules.map(([label, rule]) => (
+                    <div className="brand-font-rule" key={label}>
+                      <strong>{label}</strong>
+                      <span>{rule}</span>
+                    </div>
                   ))}
                 </div>
               </div>
