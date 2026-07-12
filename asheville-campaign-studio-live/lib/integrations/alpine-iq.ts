@@ -83,13 +83,14 @@ function normalizeRecord(record: AlpineAudienceRecord): AudienceSegment | null {
 }
 
 function getEndpointCandidates() {
-  const configuredEndpoints =
-    getServerEnv("ALPINE_IQ_AUDIENCES_ENDPOINTS") ?? getServerEnv("ALPINE_IQ_AUDIENCES_ENDPOINT") ?? "audiences";
+  const configuredEndpoints = getServerEnv("ALPINE_IQ_AUDIENCES_ENDPOINTS");
+  const legacyEndpoint = getServerEnv("ALPINE_IQ_AUDIENCES_ENDPOINT");
+  const endpointList = configuredEndpoints ?? [legacyEndpoint, "audiences", "segments", "lists"].filter(Boolean).join(",");
 
-  return configuredEndpoints
+  return endpointList
     .split(",")
     .map((endpoint) => endpoint.trim())
-    .filter(Boolean);
+    .filter((endpoint, index, endpoints) => endpoint && endpoints.indexOf(endpoint) === index);
 }
 
 function extractRecords(body: unknown): AlpineAudienceRecord[] {
@@ -167,11 +168,11 @@ export async function getAlpineAudienceResult(): Promise<AlpineAudienceResult> {
   const attemptedEndpoints: string[] = [];
   let lastMessage = "";
 
-  try {
-    for (const endpoint of endpointCandidates) {
-      const apiUrl = explicitApiUrl ?? `${baseUrl}/${endpoint}/${alpineIqUid}`;
-      attemptedEndpoints.push(endpoint);
+  for (const endpoint of endpointCandidates) {
+    const apiUrl = explicitApiUrl ?? `${baseUrl}/${endpoint}/${alpineIqUid}`;
+    attemptedEndpoints.push(endpoint);
 
+    try {
       const response = await fetch(apiUrl, {
         headers: {
           accept: "application/json",
@@ -206,22 +207,21 @@ export async function getAlpineAudienceResult(): Promise<AlpineAudienceResult> {
         audiences,
         status: "connected"
       };
+    } catch (error) {
+      lastMessage = `Could not reach endpoint "${endpoint}": ${
+        error instanceof Error ? error.message : "network request failed"
+      }.`;
+      continue;
     }
-
-    return {
-      audiences: [],
-      status: "error",
-      message:
-        lastMessage ||
-        `Could not load Alpine IQ audiences. Tried ${attemptedEndpoints.join(", ")} for UID ${alpineIqUid}.`
-    };
-  } catch {
-    return {
-      audiences: [],
-      status: "error",
-      message: `Could not reach Alpine IQ. Tried ${attemptedEndpoints.join(", ")} for UID ${alpineIqUid}.`
-    };
   }
+
+  return {
+    audiences: [],
+    status: "error",
+    message:
+      lastMessage ||
+      `Could not load Alpine IQ audiences. Tried ${attemptedEndpoints.join(", ")} for UID ${alpineIqUid}.`
+  };
 }
 
 export async function getAlpineAudiences(): Promise<AudienceSegment[]> {
