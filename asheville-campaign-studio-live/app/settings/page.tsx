@@ -61,6 +61,8 @@ const brandKits = [
       }
     ],
     downloads: [
+      ["All Iskra fonts", "/brand-kit/asheville-dispensary/fonts/iskra-fonts.zip"],
+      ["All Montserrat fonts", "/brand-kit/asheville-dispensary/fonts/montserrat-fonts.zip"],
       ["Primary logo", "/brand-kit/asheville-dispensary/asheville-dispensary-logo.png"],
       ["Round logo", "/brand-kit/asheville-dispensary/asheville-dispensary-logo-round.png"],
       ["Hero logo", "/brand-imagery/asheville-round-logo.png"],
@@ -114,6 +116,7 @@ const ctaButtonSpecs = [
   ["Button size", "685 x 108 px"],
   ["Button position", "X 104 px, Y 62 px"],
   ["Button fill", "#497030"],
+  ["Hover fill", "#719060"],
   ["Corner radius", "2-3 px"],
   ["Text", "Montserrat SemiBold or Bold"],
   ["Text size", "31-34 px"],
@@ -128,6 +131,7 @@ const plantBarCtaButtonSpecs = [
   ["Background", "#f4efe6 cream"],
   ["Button size", "554 x 92 px"],
   ["Button fill", "#061f33"],
+  ["Hover fill", "#12364f"],
   ["Corner radius", "999 px"],
   ["Text", "Clean sans, Bold"],
   ["Text size", "22-26 px"],
@@ -195,7 +199,15 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         ))}
       </nav>
 
-      <section className="panel cta-spec-card" aria-label={`${activeBrand.name} CTA button specs`}>
+      <nav className="brand-kit-jump-nav" aria-label="Brand kit sections">
+        <a href="#assets">Assets</a>
+        <a href="#colors">Colors</a>
+        <a href="#typography">Typography</a>
+        <a href="#buttons">Buttons</a>
+        {isAsheville ? <a href="#commerce">Commerce UI</a> : null}
+      </nav>
+
+      <section className="panel cta-spec-card" id="buttons" aria-label={`${activeBrand.name} CTA button specs`}>
           <div className="section-heading">
             <p>CTA Button Specs</p>
             <span>Canva-ready</span>
@@ -217,7 +229,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           </div>
         </section>
 
-      <section className="brand-kit-grid" aria-label="Downloadable brand assets">
+      <section className="brand-kit-grid" id="assets" aria-label="Downloadable brand assets">
         <article className="panel brand-kit-card" key={activeBrand.name}>
           <div className="brand-kit-card-grid">
             <div className="brand-kit-primary-column">
@@ -229,7 +241,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                 </div>
               </div>
 
-              <div className="brand-kit-section">
+              <div className="brand-kit-section" id="colors">
                 <h2>Colors</h2>
                 <div className="brand-color-groups">
                   {activeBrand.colorGroups.map((group) => (
@@ -251,6 +263,16 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
               <div className="brand-kit-section">
                 <h2>Font downloads</h2>
+                {isAsheville ? (
+                  <div className="font-bundle-list">
+                    <a href="/brand-kit/asheville-dispensary/fonts/iskra-fonts.zip" download>
+                      Download all Iskra
+                    </a>
+                    <a href="/brand-kit/asheville-dispensary/fonts/montserrat-fonts.zip" download>
+                      Download all Montserrat
+                    </a>
+                  </div>
+                ) : null}
                 <div className="brand-font-list">
                   {activeBrand.fonts.map(([label, href]) => (
                     href ? (
@@ -264,7 +286,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                 </div>
               </div>
 
-              <div className="brand-kit-section">
+              <div className="brand-kit-section" id="typography">
                 <h2>Typography</h2>
                 <div className="brand-type-scale">
                   {activeBrand.typography.map(([label, sample, family, size, lineHeight, color]) => (
@@ -295,6 +317,47 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                   ))}
                 </div>
               </div>
+
+              {isAsheville ? (
+                <div className="brand-kit-section" id="commerce">
+                  <h2>Commerce UI</h2>
+                  <div className="commerce-guidelines">
+                    <article className="product-card-spec">
+                      <div className="product-image-frame">
+                        <span className="effect-badge">Euphoric</span>
+                        <div className="flower-shape" aria-hidden="true" />
+                        <span className="thca-badge">THCA: 36%</span>
+                      </div>
+                      <small>Private Reserve</small>
+                      <h3>Super Boof THCA Flower</h3>
+                      <p>159 reviews</p>
+                      <strong>From: $13</strong>
+                      <div className="product-actions">
+                        <span>Select Options</span>
+                        <span>View Product</span>
+                      </div>
+                    </article>
+
+                    <article className="icon-tile-spec">
+                      <div className="icon-grid-spec">
+                        {[
+                          ["□", "Free Nation-wide Shipping over $99"],
+                          ["♧", "Satisfaction Guaranteed"],
+                          ["✺", "Organic Products"],
+                          ["⌬", "DEA Certified Lab Testing"],
+                          ["▭", "Secure Payment"],
+                          ["▤", "No Medical Card Needed"]
+                        ].map(([icon, label]) => (
+                          <div key={label}>
+                            <span>{icon}</span>
+                            <strong>{label}</strong>
+                          </div>
+                        ))}
+                      </div>
+                    </article>
+                  </div>
+                </div>
+              ) : null}
             </div>
           </div>
         </article>
