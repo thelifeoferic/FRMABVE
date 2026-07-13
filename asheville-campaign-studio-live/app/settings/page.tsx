@@ -11,19 +11,54 @@ const brandKits = [
       ["Montserrat", "/brand-kit/asheville-dispensary/fonts/montserrat-variable.ttf"],
       ["Montserrat Italic", "/brand-kit/asheville-dispensary/fonts/montserrat-italic-variable.ttf"]
     ],
-    fontRules: [
-      ["Display headings", "Use Iskra Bold or Medium for short campaign headlines and major page titles."],
-      ["Body copy", "Use Montserrat Regular or Medium for paragraphs, product details, labels, and practical campaign copy."],
-      ["CTA buttons", "Use Montserrat SemiBold or Bold, centered, with modest letter spacing."],
-      ["Restraint", "Avoid mixing extra decorative fonts into Asheville email or campaign layouts."]
+    typography: [
+      ["Display", "The quick brown fox", "Iskra Medium/Bold", "64-96 px", "90-110%", "#151514"],
+      ["Heading 1", "The quick brown fox", "Iskra Medium/Bold", "48-64 px", "100-110%", "#151514"],
+      ["Heading 2", "The quick brown fox jumps over", "Iskra Medium", "30-42 px", "110-120%", "#151514"],
+      ["Body", "The quick brown fox jumps over the lazy dog.", "Montserrat Regular/Medium", "16-18 px", "145-155%", "#151514"],
+      ["CTA", "Shop All THCA Flower", "Montserrat SemiBold/Bold", "31-34 px", "100%", "#F7F5EF"]
     ],
-    colors: [
-      ["Cream", "#f8f4ec"],
-      ["Black", "#171717"],
-      ["Deep green", "#1f3f21"],
-      ["Moss", "#315f34"],
-      ["Gold", "#c9a24a"],
-      ["Cherry", "#671f34"]
+    colorGroups: [
+      {
+        title: "Main Brand",
+        colors: [
+          ["Primary green", "#497030"],
+          ["Deep green", "#263E22"],
+          ["Near black", "#21211F"],
+          ["Warm tan", "#E3D4C7"],
+          ["Pale green", "#D5E0C4"]
+        ]
+      },
+      {
+        title: "Text",
+        colors: [
+          ["Ink", "#151514"],
+          ["Cream text", "#F7F5EF"]
+        ]
+      },
+      {
+        title: "Effects",
+        colors: [
+          ["Chill", "#8F8DFF"],
+          ["Creative", "#F79685"],
+          ["Energetic", "#EC5B1C"],
+          ["Euphoric", "#4FA565"],
+          ["Focus", "#DD893C"],
+          ["Happy", "#E9B600"],
+          ["Relief", "#BF2033"],
+          ["Sleepy", "#244777"]
+        ]
+      },
+      {
+        title: "Seltzer",
+        colors: [
+          ["Uplift", "#CF7B3C"],
+          ["Mellow", "#1C3D5F"],
+          ["Elevation", "#80CCE2"],
+          ["Cosmic", "#ADD55D"],
+          ["Bliss", "#408076"]
+        ]
+      }
     ],
     downloads: [
       ["Primary logo", "/brand-kit/asheville-dispensary/asheville-dispensary-logo.png"],
@@ -45,19 +80,24 @@ const brandKits = [
       ["Scotch-style editorial serif", ""],
       ["Warm script accent", ""]
     ],
-    fontRules: [
-      ["Editorial titles", "Use the Plant Bar serif for menu headlines, seasonal titles, and slower editorial moments."],
-      ["Body copy", "Use the clean sans for descriptions, navigation, product notes, and readable campaign copy."],
-      ["Accent script", "Use the handwritten script sparingly for flavor lines or mood statements, never for long text."],
-      ["CTA buttons", "Use uppercase sans, wide tracking, white text, and the deep navy rounded pill."]
+    typography: [
+      ["Editorial title", "Summer Seasonal Menu", "Plant Bar serif", "54-76 px", "95-105%", "#061F33"],
+      ["Mood line", "Honey, citrus, mint, hibiscus & rose.", "Warm script accent", "30-42 px", "105-115%", "#704F49"],
+      ["Body", "Fresh flavors, summer mood, sunny days.", "Clean sans", "18-22 px", "145%", "#455B61"],
+      ["CTA", "See The Seasonal Menu →", "Clean sans Bold", "20-24 px", "100%", "#FFFFFF"]
     ],
-    colors: [
-      ["Mint", "#e5f5ef"],
-      ["Blush", "#ffa2a8"],
-      ["Navy", "#061f33"],
-      ["Cocoa", "#704f49"],
-      ["Tea amber", "#d9a45f"],
-      ["Cream", "#f4efe6"]
+    colorGroups: [
+      {
+        title: "Plant Bar",
+        colors: [
+          ["Mint", "#E5F5EF"],
+          ["Blush", "#FFA2A8"],
+          ["Navy", "#061F33"],
+          ["Cocoa", "#704F49"],
+          ["Tea amber", "#D9A45F"],
+          ["Cream", "#F4EFE6"]
+        ]
+      }
     ],
     downloads: [
       ["Logo PNG", "/brand-kit/plant-bar/plant-bar-logo-wide.png"],
@@ -73,7 +113,7 @@ const ctaButtonSpecs = [
   ["Background", "#f3eee6 cream"],
   ["Button size", "685 x 108 px"],
   ["Button position", "X 104 px, Y 62 px"],
-  ["Button fill", "#4a6f2f"],
+  ["Button fill", "#497030"],
   ["Corner radius", "2-3 px"],
   ["Text", "Montserrat SemiBold or Bold"],
   ["Text size", "31-34 px"],
@@ -133,8 +173,8 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
           <aside className="brand-kit-quick-downloads" aria-label={`${activeBrand.name} quick downloads`}>
             <div className="section-heading">
-              <p>Downloads</p>
-              <span>Above the fold</span>
+              <p>Assets</p>
+              <span aria-hidden="true" className="download-icon">↓</span>
             </div>
             <div className="brand-download-list">
               {activeBrand.downloads.map(([label, href]) => (
@@ -191,19 +231,26 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
               <div className="brand-kit-section">
                 <h2>Colors</h2>
-                <div className="brand-color-grid">
-                  {activeBrand.colors.map(([name, color]) => (
-                    <div className="brand-color-chip" key={color}>
-                      <span style={{ backgroundColor: color }} />
-                      <strong>{name}</strong>
-                      <code>{color}</code>
+                <div className="brand-color-groups">
+                  {activeBrand.colorGroups.map((group) => (
+                    <div className="brand-color-group" key={group.title}>
+                      <h3>{group.title}</h3>
+                      <div className="brand-color-grid">
+                        {group.colors.map(([name, color]) => (
+                          <div className="brand-color-chip" key={color}>
+                            <span style={{ backgroundColor: color }} />
+                            <strong>{name}</strong>
+                            <code>{color}</code>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
 
               <div className="brand-kit-section">
-                <h2>Fonts</h2>
+                <h2>Font downloads</h2>
                 <div className="brand-font-list">
                   {activeBrand.fonts.map(([label, href]) => (
                     href ? (
@@ -218,12 +265,32 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               </div>
 
               <div className="brand-kit-section">
-                <h2>Font rules</h2>
-                <div className="brand-font-rules">
-                  {activeBrand.fontRules.map(([label, rule]) => (
-                    <div className="brand-font-rule" key={label}>
-                      <strong>{label}</strong>
-                      <span>{rule}</span>
+                <h2>Typography</h2>
+                <div className="brand-type-scale">
+                  {activeBrand.typography.map(([label, sample, family, size, lineHeight, color]) => (
+                    <div className="brand-type-row" key={label}>
+                      <div>
+                        <strong>{label}</strong>
+                        <p>{sample}</p>
+                      </div>
+                      <dl>
+                        <div>
+                          <dt>Font</dt>
+                          <dd>{family}</dd>
+                        </div>
+                        <div>
+                          <dt>Size</dt>
+                          <dd>{size}</dd>
+                        </div>
+                        <div>
+                          <dt>Line</dt>
+                          <dd>{lineHeight}</dd>
+                        </div>
+                        <div>
+                          <dt>Color</dt>
+                          <dd>{color}</dd>
+                        </div>
+                      </dl>
                     </div>
                   ))}
                 </div>

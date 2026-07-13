@@ -1441,6 +1441,27 @@ dd {
   padding: 16px;
 }
 
+.brand-kit-quick-downloads .section-heading {
+  align-items: center;
+}
+
+.download-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  background: var(--action-bg);
+  color: var(--action-text);
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.brand-kit-page[data-brand="plant-bar"] .download-icon {
+  background: #061f33;
+}
+
 .brand-kit-quick-downloads .brand-download-list {
   display: grid;
   grid-template-columns: 1fr;
@@ -1463,6 +1484,11 @@ dd {
   letter-spacing: 0.04em;
   padding: 10px 16px;
   text-decoration: none;
+}
+
+.brand-kit-page[data-brand="plant-bar"] .ghost-link {
+  border-color: #061f33;
+  color: #061f33;
 }
 
 .brand-kit-grid {
@@ -1520,7 +1546,7 @@ dd {
   width: min(685px, 100%);
   min-height: 108px;
   border-radius: 3px;
-  background: #4a6f2f;
+  background: #497030;
   color: #ffffff;
   font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(24px, 3vw, 34px);
@@ -1931,6 +1957,30 @@ dd {
   gap: 10px;
 }
 
+.brand-color-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.brand-color-group {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 253, 248, 0.72);
+  padding: 12px;
+}
+
+.brand-color-group h3 {
+  margin: 0;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .brand-color-chip {
   display: grid;
   grid-template-columns: 34px minmax(0, 1fr);
@@ -1977,6 +2027,104 @@ dd {
   font-weight: 850;
   padding: 10px 14px;
   text-decoration: none;
+}
+
+.brand-type-scale {
+  display: grid;
+  gap: 10px;
+}
+
+.brand-type-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.62fr);
+  gap: 18px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #f2f2f0;
+  padding: 16px;
+}
+
+.brand-type-row strong {
+  display: inline-block;
+  margin-bottom: 10px;
+  border-bottom: 4px solid #1795e8;
+  color: var(--ink);
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 950;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.brand-type-row p {
+  color: #151514;
+  font-family: "Iskra W01", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(24px, 4vw, 56px);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.brand-type-row:nth-child(3) p {
+  font-size: clamp(22px, 3vw, 34px);
+}
+
+.brand-type-row:nth-child(4) p {
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 17px;
+  font-weight: 520;
+  line-height: 1.45;
+}
+
+.brand-type-row:nth-child(5) p {
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(20px, 2.6vw, 32px);
+  font-weight: 760;
+  letter-spacing: 0.05em;
+}
+
+.brand-kit-page[data-brand="plant-bar"] .brand-type-row p {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  color: #061f33;
+}
+
+.brand-kit-page[data-brand="plant-bar"] .brand-type-row:nth-child(2) p {
+  color: #704f49;
+  font-family: "Comic Sans MS", "Bradley Hand", cursive;
+}
+
+.brand-kit-page[data-brand="plant-bar"] .brand-type-row:nth-child(3) p,
+.brand-kit-page[data-brand="plant-bar"] .brand-type-row:nth-child(4) p {
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+.brand-type-row dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.brand-type-row dl div {
+  display: grid;
+  gap: 2px;
+  border-radius: 5px;
+  background: #fffdf8;
+  padding: 8px 10px;
+}
+
+.brand-type-row dt {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.brand-type-row dd {
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 760;
 }
 
 .brand-font-rules {
@@ -2049,6 +2197,11 @@ dd {
 
   .cta-spec-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .brand-color-groups,
+  .brand-type-row {
+    grid-template-columns: 1fr;
   }
 
   .prompt-library-card summary {
