@@ -6,10 +6,10 @@ export async function POST(request: Request) {
   const username = String(formData.get("username") ?? "").trim();
   const password = String(formData.get("password") ?? "");
   const credentials = getLockCredentials();
-  const nextUrl = new URL("/", request.url);
+  const nextUrl = new URL("/asheville", request.url);
 
   if (username !== credentials.username || password !== credentials.password || !credentials.password) {
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL("/asheville/login", request.url);
     loginUrl.searchParams.set("error", "1");
     return NextResponse.redirect(loginUrl, 303);
   }

@@ -10,7 +10,7 @@ export default async function LoginPage({
     <main className="lock-screen">
       <section className="lock-card" aria-label="From Above login">
         <div className="lock-mark">FROM ABOVE</div>
-        <p className="lock-eyebrow">Campaign Studio</p>
+        <p className="lock-eyebrow">Asheville Campaign Studio</p>
         <h1>Locked workspace</h1>
         <p className="lock-copy">Sign in to build draft campaigns for Asheville Dispensary and connected brands.</p>
 

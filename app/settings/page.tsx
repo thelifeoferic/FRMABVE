@@ -51,7 +51,7 @@ export default function SettingsPage() {
         <p>
           Keep the campaign studio and the final creative working from the same source of truth.
         </p>
-        <a className="ghost-link" href="/">
+        <a className="ghost-link" href="/asheville">
           Back to Campaign Studio
         </a>
       </section>
