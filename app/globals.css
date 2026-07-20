@@ -83,6 +83,60 @@ body {
   text-transform: lowercase;
 }
 
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 18px;
+  min-height: 64px;
+  padding: 12px 28px;
+  border-bottom: 1px solid rgba(38, 62, 34, 0.12);
+  background: rgba(255, 253, 248, 0.94);
+  backdrop-filter: blur(14px);
+}
+
+.app-header-mark {
+  color: var(--ink);
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+}
+
+.app-header-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.app-header-nav a {
+  min-height: 34px;
+  border: 1px solid rgba(49, 95, 52, 0.24);
+  border-radius: 3px;
+  color: var(--action-bg);
+  font-family: "Montserrat AVL", Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: 12px;
+  font-weight: 850;
+  padding: 8px 12px;
+  text-decoration: none;
+}
+
+.app-header-nav a.active {
+  background: var(--action-bg);
+  color: var(--action-text);
+}
+
+.app-header-context {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
 button,
 input,
 select,
@@ -470,6 +524,7 @@ dd,
 
 .prompt-panel,
 .image-set-panel,
+.image-edit-studio,
 .klaviyo-review-panel,
 .strategy-panel,
 .concepts-panel,
@@ -1222,6 +1277,110 @@ dd {
   margin-top: 0;
 }
 
+.image-edit-studio {
+  display: grid;
+  gap: 16px;
+}
+
+.image-edit-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.44fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.image-edit-preview {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f7f2e8;
+  padding: 10px;
+}
+
+.image-edit-preview img {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  border-radius: 6px;
+  object-fit: contain;
+}
+
+.image-edit-controls {
+  display: grid;
+  gap: 12px;
+}
+
+.image-edit-controls label {
+  display: grid;
+  gap: 8px;
+  color: var(--ink);
+  font-weight: 850;
+}
+
+.image-edit-controls textarea {
+  min-height: 132px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffdf8;
+  color: var(--ink);
+  padding: 12px;
+  resize: vertical;
+}
+
+.edit-output-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.edit-output-option {
+  display: grid;
+  gap: 4px;
+  min-height: 72px;
+  border: 1px solid rgba(49, 95, 52, 0.24);
+  border-radius: 6px;
+  background: #fffdf8;
+  color: var(--ink);
+  padding: 10px;
+  text-align: left;
+}
+
+.edit-output-option strong {
+  font-size: 13px;
+  line-height: 1.15;
+}
+
+.edit-output-option span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.edit-output-option.active {
+  border-color: var(--action-bg);
+  background: var(--action-bg);
+  color: var(--action-text);
+}
+
+.edit-output-option.active span {
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.image-edit-submit {
+  margin-top: 0;
+}
+
+.image-edit-error {
+  border: 1px solid #dec79e;
+  border-radius: 8px;
+  background: #fff2dc;
+  color: #6d4f22;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.35;
+  padding: 10px 12px;
+}
+
 .social-kit-panel {
   display: grid;
   gap: 14px;
@@ -1749,7 +1908,7 @@ dd {
 
 .prompt-tabs {
   position: sticky;
-  top: 0;
+  top: 64px;
   z-index: 4;
   display: flex;
   flex-wrap: wrap;
@@ -1810,7 +1969,7 @@ dd {
 
 .brand-kit-jump-nav {
   position: sticky;
-  top: 0;
+  top: 64px;
   z-index: 3;
   display: flex;
   flex-wrap: wrap;
@@ -2595,6 +2754,29 @@ dd {
 }
 
 @media (max-width: 720px) {
+  .app-header {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    min-height: 0;
+    padding: 10px 16px;
+    text-align: center;
+  }
+
+  .app-header-nav {
+    flex-wrap: nowrap;
+    justify-content: center;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .app-header-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .app-header-context {
+    display: none;
+  }
+
   .studio-shell {
     padding: 0 0 28px;
   }
@@ -2628,7 +2810,7 @@ dd {
 
   .stepper {
     position: sticky;
-    top: 0;
+    top: 100px;
     z-index: 5;
     display: flex;
     flex-wrap: nowrap;
@@ -2733,6 +2915,7 @@ dd {
 
   .prompt-grid,
   .klaviyo-field-grid,
+  .image-edit-layout,
   dl,
   .approval-panel,
   .concept-card,
@@ -2740,6 +2923,10 @@ dd {
   .social-kit-formats,
   .asset-dropzone,
   .asset-row {
+    grid-template-columns: 1fr;
+  }
+
+  .edit-output-options {
     grid-template-columns: 1fr;
   }
 

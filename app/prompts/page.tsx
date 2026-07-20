@@ -1,3 +1,5 @@
+import { AppHeader } from "@/components/AppHeader/AppHeader";
+
 const promptGroups = [
   {
     id: "asheville",
@@ -228,6 +230,8 @@ export default async function PromptsPage({ searchParams }: PromptsPageProps) {
 
   return (
     <main className="settings-page prompts-page" data-brand={activeGroup.id}>
+      <AppHeader active="prompts" brandId={activeGroup.id} brandName={activeGroup.label} />
+
       <section className="panel brand-kit-hero prompts-hero">
         <div className="section-heading">
           <p>AI Prompts</p>

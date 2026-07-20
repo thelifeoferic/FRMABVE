@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApprovalPanel } from "@/components/ApprovalPanel/ApprovalPanel";
+import { AppHeader } from "@/components/AppHeader/AppHeader";
+import { ImageEditStudio } from "@/components/ImageEditor/ImageEditStudio";
 import { ImageSetPanel } from "@/components/ImageGeneration/ImageSetPanel";
 import { KlaviyoFieldsPanel } from "@/components/KlaviyoFields/KlaviyoFieldsPanel";
 import { PromptBox } from "@/components/PromptBox/PromptBox";
@@ -43,9 +45,10 @@ const initialInput: CampaignInput = {
   notes: ""
 };
 
-const steps = ["Brief", "Klaviyo Fields", "Images", "Review", "Klaviyo Draft"];
+const steps = ["Brief", "Klaviyo Fields", "Images", "Edit", "Review", "Klaviyo Draft"];
 const economyImageCount = 3;
 const similarVariants: GeneratedImage["version"][] = ["A", "B", "C"];
+type EditOutput = "square" | "story" | "wide";
 
 export function CampaignStudio() {
   const [input, setInput] = useState<CampaignInput>(initialInput);
@@ -66,9 +69,12 @@ export function CampaignStudio() {
   const [drafting, setDrafting] = useState(false);
   const [exportingDrive, setExportingDrive] = useState(false);
   const [generatingImages, setGeneratingImages] = useState(false);
+  const [editingImage, setEditingImage] = useState(false);
+  const [imageEditError, setImageEditError] = useState("");
   const promptRef = useRef<HTMLDivElement>(null);
   const fieldsRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<HTMLDivElement>(null);
+  const editRef = useRef<HTMLDivElement>(null);
   const draftRef = useRef<HTMLDivElement>(null);
 
   const selectedConcept =
@@ -76,7 +82,7 @@ export function CampaignStudio() {
     concepts.find((concept) => concept.name === generatedImages.find((image) => image.id === selectedImageId)?.style) ??
     null;
   const selectedImage = generatedImages.find((image) => image.id === selectedImageId) ?? null;
-  const activeStepIndex = draft ? 4 : selectedImage ? 3 : strategy ? 1 : 0;
+  const activeStepIndex = draft ? 5 : selectedImage ? 3 : strategy ? 1 : 0;
 
   useEffect(() => {
     async function loadAudiences() {
@@ -138,6 +144,7 @@ export function CampaignStudio() {
     setGeneratedImages([]);
     setSelectedConceptId(null);
     setSelectedImageId(null);
+    setImageEditError("");
     setDraft(null);
     setDriveExport(null);
   }
@@ -161,6 +168,7 @@ export function CampaignStudio() {
     setGeneratedImages(nextImages);
     setSelectedConceptId("cream-studio");
     setSelectedImageId(null);
+    setImageEditError("");
     setDraft(null);
     setDriveExport(null);
 
@@ -187,6 +195,7 @@ export function CampaignStudio() {
       Brief: promptRef,
       "Klaviyo Fields": fieldsRef,
       Images: imagesRef,
+      Edit: editRef,
       Review: draftRef,
       "Klaviyo Draft": draftRef
     };
@@ -265,6 +274,7 @@ export function CampaignStudio() {
       if (body.images?.length) {
         setGeneratedImages(body.images);
         setSelectedImageId(body.images.find((image) => image.imageUrl)?.id ?? null);
+        setImageEditError("");
         setDriveExport(null);
       } else {
         setGeneratedImages((current) =>
@@ -326,6 +336,7 @@ export function CampaignStudio() {
       if (body.images?.length) {
         setGeneratedImages(body.images);
         setSelectedImageId(body.images.find((image) => image.imageUrl)?.id ?? null);
+        setImageEditError("");
         setDriveExport(null);
       } else {
         setGeneratedImages((current) =>
@@ -345,8 +356,50 @@ export function CampaignStudio() {
     }
   }
 
+  async function editSelectedImage(editPrompt: string, output: EditOutput) {
+    if (!selectedImage?.imageUrl) return;
+
+    setEditingImage(true);
+    setImageEditError("");
+
+    try {
+      const response = await fetch("/api/images/edit", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          image: selectedImage,
+          editPrompt,
+          output
+        })
+      });
+      const body = (await response.json().catch(() => ({}))) as { image?: GeneratedImage; error?: string };
+
+      if (!response.ok || !body.image) {
+        throw new Error(body.error ?? `Image edit returned HTTP ${response.status}.`);
+      }
+
+      setGeneratedImages((current) => [body.image as GeneratedImage, ...current.filter((image) => image.id !== body.image?.id)]);
+      setSelectedImageId(body.image.id);
+      setSelectedConceptId(concepts.find((concept) => concept.name === body.image?.style)?.id ?? null);
+      setDraft(null);
+      setDriveExport(null);
+
+      window.requestAnimationFrame(() => {
+        editRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    } catch (error) {
+      setImageEditError(error instanceof Error ? error.message : "Image edit request failed.");
+    } finally {
+      setEditingImage(false);
+    }
+  }
+
   return (
     <main className="studio-shell" data-brand={selectedBrand.id}>
+      <AppHeader active="studio" brandId={selectedBrand.id} brandName={selectedBrand.name} />
+
       <header className="topbar">
         <img src={selectedBrand.heroSrc} alt={selectedBrand.heroAlt} />
         <img className="hero-brand-logo" src={selectedBrand.logoSrc} alt={`${selectedBrand.name} logo`} />
@@ -435,11 +488,22 @@ export function CampaignStudio() {
               onSelectImage={(image) => {
                 setSelectedImageId(image.id);
                 setSelectedConceptId(concepts.find((concept) => concept.name === image.style)?.id ?? null);
+                setImageEditError("");
                 setDraft(null);
                 setDriveExport(null);
               }}
               onGenerateImages={generateImages}
               onGenerateSimilar={generateSimilarImages}
+            />
+          </div>
+
+          <div ref={editRef}>
+            <ImageEditStudio
+              selectedImage={selectedImage}
+              brand={selectedBrand}
+              editing={editingImage}
+              error={imageEditError}
+              onEditImage={editSelectedImage}
             />
           </div>
 
