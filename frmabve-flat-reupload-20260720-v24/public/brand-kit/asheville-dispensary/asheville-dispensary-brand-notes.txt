@@ -1,0 +1,29 @@
+Asheville Dispensary Brand Notes
+
+Core feel
+- Cannabis, apothecary, and lounge.
+- Premium, local, natural, restrained, product-forward.
+
+Color direction
+- Cream: #f8f4ec
+- Black: #171717
+- Deep green: #1f3f21
+- Moss: #315f34
+- Warm gold: #c9a24a
+- Cherry accent: #671f34
+
+Typography direction
+- Primary brand font: Iskra W01.
+- Supporting brand font: Montserrat.
+- Use Iskra selectively for expressive brand headings and short display moments.
+- Use Montserrat for clean campaign fields, body copy, buttons, and utility text.
+- Keep copy compact and confident.
+
+Image direction
+- Product-forward, warm cream surfaces, soft daylight, natural shadows, fruit or botanical cues.
+- Keep product packaging readable and fully inside the frame.
+- Avoid cluttered collage layouts and oversized text that risks cropping.
+
+Sender defaults
+- From email: no-reply@avldispensary.com
+- Reply-to email: support@avldispensary.com
