@@ -10,6 +10,118 @@ const PRODUCT_SITEMAP_URLS = [
 ];
 const PRODUCT_PAGE_LIMIT = 8;
 
+const ashevilleCatalogProducts: ProductOption[] = [
+  {
+    id: "trop-cherry-strain",
+    name: "Trop Cherry THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower / Private Reserve",
+    url: "https://avldispensary.com/shop/thca/thca-flower/private-reserve-thca-flower/trop-cherry-strain/"
+  },
+  {
+    id: "super-boof-strain",
+    name: "Super Boof THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower / Private Reserve",
+    url: "https://avldispensary.com/shop/thca/thca-flower/private-reserve-thca-flower/super-boof-strain/"
+  },
+  {
+    id: "secret-cookies-strain",
+    name: "Secret Cookies THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower / Private Reserve",
+    url: "https://avldispensary.com/shop/thca/thca-flower/private-reserve-thca-flower/secret-cookies-strain/"
+  },
+  {
+    id: "blue-dream-strain",
+    name: "Blue Dream THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/blue-dream-strain/"
+  },
+  {
+    id: "northern-lights-strain",
+    name: "Northern Lights THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/northern-lights-strain/"
+  },
+  {
+    id: "mendo-breath-strain",
+    name: "Mendo Breath THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/mendo-breath-strain/"
+  },
+  {
+    id: "orange-push-pop-strain",
+    name: "Orange Push Pop THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/orange-push-pop-strain/"
+  },
+  {
+    id: "banana-kush-strain",
+    name: "Banana Kush THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/banana-kush-strain/"
+  },
+  {
+    id: "rainbow-chip-strain",
+    name: "Rainbow Chip THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/rainbow-chip-strain/"
+  },
+  {
+    id: "caked-up-cherries-strain",
+    name: "Caked Up Cherries THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/caked-up-cherries-strain/"
+  },
+  {
+    id: "bananaconda-strain",
+    name: "Bananaconda THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/bananaconda-strain/"
+  },
+  {
+    id: "sour-diesel-thca-vape",
+    name: "Sativa 3 Gram THCA Vape - Sour Diesel",
+    source: "asheville-dispensary",
+    category: "Vapes",
+    price: "$50.00",
+    url: "https://avldispensary.com/"
+  },
+  {
+    id: "delta-9-gummies-feel-good-gummies",
+    name: "Delta 9 Gummies - Feel Good Gummies",
+    source: "asheville-dispensary",
+    category: "Gummies",
+    price: "From $33",
+    url: "https://avldispensary.com/"
+  },
+  {
+    id: "delta-9-seltzer-bliss-10mg",
+    name: "Delta 9 Seltzer - Bliss 10mg",
+    source: "asheville-dispensary",
+    category: "Seltzer",
+    price: "From $5.60",
+    url: "https://avldispensary.com/"
+  },
+  {
+    id: "cbd-sleep-gummies-sleepy-time-gummies",
+    name: "CBD Sleep Gummies - Sleepy Time Gummies",
+    source: "asheville-dispensary",
+    category: "Gummies",
+    price: "From $33",
+    url: "https://avldispensary.com/"
+  }
+];
+
 const fallbackProducts: ProductOption[] = [
   {
     id: "delta-9-gummies-feel-good-gummies",
@@ -138,8 +250,8 @@ function dedupeProducts(products: ProductOption[]) {
 }
 
 function getFallbackProducts(query: string) {
-  const matches = fallbackProducts.filter((product) => matchesQuery(product, query));
-  return query.trim() ? matches : fallbackProducts;
+  const matches = ashevilleCatalogProducts.filter((product) => matchesQuery(product, query));
+  return query.trim() ? matches : ashevilleCatalogProducts;
 }
 
 function isProductUrl(url: string) {
@@ -389,7 +501,14 @@ export async function getAshevilleProducts(query = ""): Promise<ProductOption[]>
     const htmlSearchProducts = await getHtmlSearchProducts(trimmedQuery).catch(() => []);
     const storeProducts = await getStoreProducts(trimmedQuery);
     const sitemapProducts = await getSitemapProducts(trimmedQuery).catch(() => []);
-    const directSearchProducts = dedupeProducts([...wordpressProducts, ...htmlSearchProducts, ...storeProducts, ...sitemapProducts]);
+    const catalogProducts = getFallbackProducts(trimmedQuery);
+    const directSearchProducts = dedupeProducts([
+      ...wordpressProducts,
+      ...htmlSearchProducts,
+      ...storeProducts,
+      ...sitemapProducts,
+      ...catalogProducts
+    ]);
 
     if (directSearchProducts.length) {
       return directSearchProducts.slice(0, 200);
