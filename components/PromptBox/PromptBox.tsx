@@ -356,20 +356,26 @@ export function PromptBox({
         ) : null}
         {hasProductQuery ? (
           <div className="product-options">
-            {visibleProducts.map((product) => (
-              <button
-                key={product.id}
-                className={productIds.includes(product.id) ? "product-chip selected" : "product-chip"}
-                type="button"
-                onClick={() => toggleProduct(product)}
-              >
-                <strong>{product.name}</strong>
-                <span>
-                  {product.category ?? "Website"}
-                  {product.price ? ` / ${product.price}` : ""}
-                </span>
-              </button>
-            ))}
+            {visibleProducts.length ? (
+              visibleProducts.map((product) => (
+                <button
+                  key={product.id}
+                  className={productIds.includes(product.id) ? "product-chip selected" : "product-chip"}
+                  type="button"
+                  onClick={() => toggleProduct(product)}
+                >
+                  <strong>{product.name}</strong>
+                  <span>
+                    {product.category ?? "Website"}
+                    {product.price ? ` / ${product.price}` : ""}
+                  </span>
+                </button>
+              ))
+            ) : (
+              <div className="product-empty-state">
+                {loadingProducts ? "Searching Asheville Dispensary products..." : "No matching products found."}
+              </div>
+            )}
           </div>
         ) : null}
       </div>

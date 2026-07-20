@@ -4,7 +4,8 @@ const PRODUCT_SOURCE_URL = "https://avldispensary.com/";
 const STORE_PRODUCTS_URL = "https://avldispensary.com/wp-json/wc/store/v1/products";
 const PRODUCT_SITEMAP_URLS = [
   "https://avldispensary.com/product-sitemap.xml",
-  "https://avldispensary.com/product-sitemap1.xml"
+  "https://avldispensary.com/product-sitemap1.xml",
+  "https://avldispensary.com/page-sitemap.xml"
 ];
 const PRODUCT_PAGE_LIMIT = 8;
 
@@ -128,6 +129,36 @@ function dedupeProducts(products: ProductOption[]) {
   );
 }
 
+function getFallbackProducts(query: string) {
+  const matches = fallbackProducts.filter((product) => matchesQuery(product, query));
+  return query.trim() ? matches : fallbackProducts;
+}
+
+function isProductUrl(url: string) {
+  if (!url.startsWith("https://avldispensary.com/shop/")) return false;
+
+  return ![
+    "/product-category/",
+    "/cart",
+    "/checkout",
+    "/my-account",
+    "/wishlist"
+  ].some((blockedPath) => url.includes(blockedPath));
+}
+
+function inferCategoryFromUrl(url: string, name: string) {
+  const normalized = `${url} ${name}`.toLowerCase();
+
+  if (normalized.includes("thca-flower") || normalized.includes("flower")) return "Flower";
+  if (normalized.includes("pre-roll") || normalized.includes("preroll")) return "Pre-Rolls";
+  if (normalized.includes("vape")) return "Vapes";
+  if (normalized.includes("gumm")) return "Gummies";
+  if (normalized.includes("seltzer")) return "Seltzer";
+  if (normalized.includes("tincture")) return "Tinctures";
+
+  return "Website";
+}
+
 function formatStorePrice(product: StoreProduct) {
   const price = product.prices?.price;
 
@@ -208,7 +239,7 @@ async function getSitemapProducts(query: string): Promise<ProductOption[]> {
   );
   const urls = sitemapResponses
     .flatMap((xml) => Array.from(xml.matchAll(/<loc>(.*?)<\/loc>/gi)).map((match) => decodeEntities(match[1])))
-    .filter((url) => url.includes("/product/"));
+    .filter(isProductUrl);
   const products = urls.map((url) => {
     const slug = url
       .replace(/\/$/, "")
@@ -225,7 +256,7 @@ async function getSitemapProducts(query: string): Promise<ProductOption[]> {
       id: slug || slugify(name),
       name,
       source: "asheville-dispensary" as const,
-      category: name.toLowerCase().includes("flower") ? "Flower" : "Website",
+      category: inferCategoryFromUrl(url, name),
       url
     };
   });
@@ -252,7 +283,7 @@ export async function getAshevilleProducts(query = ""): Promise<ProductOption[]>
     });
 
     if (!response.ok) {
-      return fallbackProducts;
+      return getFallbackProducts(trimmedQuery);
     }
 
     const html = await response.text();
@@ -280,13 +311,13 @@ export async function getAshevilleProducts(query = ""): Promise<ProductOption[]>
       ? deduped.filter((product) => product.name.toLowerCase().includes(trimmedQuery.toLowerCase()))
       : deduped;
 
-    return filtered.length ? filtered.slice(0, 200) : fallbackProducts;
+    return filtered.length ? filtered.slice(0, 200) : getFallbackProducts(trimmedQuery);
   } catch {
     try {
       const sitemapProducts = await getSitemapProducts(trimmedQuery);
-      return sitemapProducts.length ? sitemapProducts.slice(0, 200) : fallbackProducts;
+      return sitemapProducts.length ? sitemapProducts.slice(0, 200) : getFallbackProducts(trimmedQuery);
     } catch {
-      return fallbackProducts;
+      return getFallbackProducts(trimmedQuery);
     }
   }
 }
