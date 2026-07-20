@@ -2,6 +2,7 @@ import type { BrandId, ProductOption } from "@/lib/types/campaign";
 
 const PRODUCT_SOURCE_URL = "https://avldispensary.com/";
 const STORE_PRODUCTS_URL = "https://avldispensary.com/wp-json/wc/store/v1/products";
+const WORDPRESS_SEARCH_URL = "https://avldispensary.com/wp-json/wp/v2/search";
 const PRODUCT_SITEMAP_URLS = [
   "https://avldispensary.com/product-sitemap.xml",
   "https://avldispensary.com/product-sitemap1.xml",
@@ -111,6 +112,13 @@ type StoreProduct = {
     currency_minor_unit?: number;
   };
   categories?: Array<{ name: string }>;
+};
+
+type WordPressSearchResult = {
+  id: number;
+  title?: string;
+  url?: string;
+  subtype?: string;
 };
 
 function matchesQuery(product: ProductOption, query: string) {
@@ -223,6 +231,118 @@ async function getStoreProducts(query: string): Promise<ProductOption[]> {
   return allProducts.filter((product) => matchesQuery(product, query));
 }
 
+async function getWordPressSearchProducts(query: string): Promise<ProductOption[]> {
+  const normalizedQuery = query.trim();
+
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  const url = new URL(WORDPRESS_SEARCH_URL);
+  url.searchParams.set("search", normalizedQuery);
+  url.searchParams.set("type", "post");
+  url.searchParams.set("subtype", "product");
+  url.searchParams.set("per_page", "50");
+
+  const response = await fetch(url, {
+    next: { revalidate: 300 },
+    headers: {
+      accept: "application/json",
+      "user-agent": "Asheville Campaign Studio WordPress product search"
+    }
+  });
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const results = (await response.json()) as WordPressSearchResult[];
+
+  return results
+    .filter((result) => result.subtype === "product" && result.url && isProductUrl(result.url))
+    .map((result) => {
+      const name = decodeEntities(result.title ?? productNameFromUrl(result.url ?? ""));
+
+      return {
+        id: String(result.id),
+        name,
+        source: "asheville-dispensary" as const,
+        category: inferCategoryFromUrl(result.url ?? "", name),
+        url: result.url
+      };
+    })
+    .filter((product) => matchesQuery(product, normalizedQuery));
+}
+
+function productNameFromUrl(url: string) {
+  const slug =
+    url
+      .replace(/\/$/, "")
+      .split("/")
+      .filter(Boolean)
+      .pop() ?? "";
+
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((part) => {
+      const lower = part.toLowerCase();
+      if (lower === "thca") return "THCA";
+      if (lower === "cbd") return "CBD";
+      if (lower === "cbg") return "CBG";
+      if (lower === "cbn") return "CBN";
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(" ");
+}
+
+async function getHtmlSearchProducts(query: string): Promise<ProductOption[]> {
+  const normalizedQuery = query.trim();
+
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  const searchUrls = [
+    `https://avldispensary.com/?s=${encodeURIComponent(normalizedQuery)}&post_type=product`,
+    `https://avldispensary.com/shop/?s=${encodeURIComponent(normalizedQuery)}&post_type=product`
+  ];
+  const responses = await Promise.all(
+    searchUrls.map(async (searchUrl) => {
+      const response = await fetch(searchUrl, {
+        next: { revalidate: 300 },
+        headers: {
+          accept: "text/html",
+          "user-agent": "Asheville Campaign Studio HTML product search"
+        }
+      });
+
+      return response.ok ? response.text() : "";
+    })
+  );
+  const urls = responses
+    .flatMap((html) => Array.from(html.matchAll(/href=["']([^"']+)["']/gi)).map((match) => decodeEntities(match[1])))
+    .map((url) => {
+      if (url.startsWith("/")) return `https://avldispensary.com${url}`;
+      return url;
+    })
+    .filter(isProductUrl);
+
+  return dedupeProducts(
+    urls.map((url) => {
+      const name = productNameFromUrl(url);
+
+      return {
+        id: slugify(url),
+        name,
+        source: "asheville-dispensary" as const,
+        category: inferCategoryFromUrl(url, name),
+        url
+      };
+    })
+  ).filter((product) => matchesQuery(product, normalizedQuery));
+}
+
 async function getSitemapProducts(query: string): Promise<ProductOption[]> {
   const sitemapResponses = await Promise.all(
     PRODUCT_SITEMAP_URLS.map(async (sitemapUrl) => {
@@ -241,16 +361,13 @@ async function getSitemapProducts(query: string): Promise<ProductOption[]> {
     .flatMap((xml) => Array.from(xml.matchAll(/<loc>(.*?)<\/loc>/gi)).map((match) => decodeEntities(match[1])))
     .filter(isProductUrl);
   const products = urls.map((url) => {
-    const slug = url
-      .replace(/\/$/, "")
-      .split("/")
-      .filter(Boolean)
-      .pop() ?? "";
-    const name = slug
-      .split("-")
-      .filter(Boolean)
-      .map((part) => (part.toLowerCase() === "thca" ? "THCA" : part.charAt(0).toUpperCase() + part.slice(1)))
-      .join(" ");
+    const slug =
+      url
+        .replace(/\/$/, "")
+        .split("/")
+        .filter(Boolean)
+        .pop() ?? "";
+    const name = productNameFromUrl(url);
 
     return {
       id: slug || slugify(name),
@@ -268,11 +385,14 @@ export async function getAshevilleProducts(query = ""): Promise<ProductOption[]>
   const trimmedQuery = query.trim();
 
   try {
+    const wordpressProducts = await getWordPressSearchProducts(trimmedQuery).catch(() => []);
+    const htmlSearchProducts = await getHtmlSearchProducts(trimmedQuery).catch(() => []);
     const storeProducts = await getStoreProducts(trimmedQuery);
     const sitemapProducts = await getSitemapProducts(trimmedQuery).catch(() => []);
+    const directSearchProducts = dedupeProducts([...wordpressProducts, ...htmlSearchProducts, ...storeProducts, ...sitemapProducts]);
 
-    if (storeProducts.length) {
-      return dedupeProducts([...storeProducts, ...sitemapProducts]).slice(0, 200);
+    if (directSearchProducts.length) {
+      return directSearchProducts.slice(0, 200);
     }
 
     const response = await fetch(PRODUCT_SOURCE_URL, {
