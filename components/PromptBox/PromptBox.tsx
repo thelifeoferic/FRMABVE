@@ -15,6 +15,7 @@ type PromptBoxProps = {
   brand: CampaignBrand;
   onChange: (next: CampaignInput) => void;
   onGenerate: () => void;
+  onGenerateFields?: () => void;
   onProductSearch: (query: string) => void;
 };
 

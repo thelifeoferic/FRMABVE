@@ -37,6 +37,13 @@
     ".next-studio/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    ".next",
+    ".next-studio",
+    "asheville-campaign-studio-live",
+    "outputs",
+    "work",
+    "campaigns",
+    "dashboard"
   ]
 }
