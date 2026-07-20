@@ -68,6 +68,26 @@ The full product or package must stay inside the frame with generous margin on a
 Use Iskra W01 selectively for short Asheville display moments and Montserrat for practical campaign copy. Keep the image clean, review-ready, and suitable for Klaviyo campaign approval.`
       },
       {
+        title: "Logo Usage Integrity",
+        type: "Brand rule",
+        summary: "Protects the Asheville Dispensary logo from edits, cropping, recoloring, or distortion.",
+        download: "/brand-kit/asheville-dispensary/prompts/logo-usage-integrity.txt",
+        rules: [
+          "Use the provided Asheville Dispensary logo exactly as shown.",
+          "Keep the full logo visible with its original aspect ratio.",
+          "Do not alter, redraw, crop, recolor, distort, replace, or modify any logo detail."
+        ],
+        code: `Asheville Dispensary Logo Usage Integrity
+
+Use the provided Asheville Dispensary logo exactly as shown.
+
+Do not alter, redraw, crop, recolor, distort, replace, or modify any text, symbols, proportions, or details.
+
+Keep the logo fully visible and preserve its original aspect ratio.
+
+When placing the logo in campaign images, brand assets, Klaviyo creative, social kit exports, or review mockups, treat the logo as a locked brand asset. It may be resized proportionally only when necessary for layout, but it must remain sharp, readable, uncropped, and visually faithful to the source file.`
+      },
+      {
         title: "CTA Button Integrity",
         type: "Design rule",
         summary: "Keeps Asheville email buttons consistent with the green rectangular CTA style.",
