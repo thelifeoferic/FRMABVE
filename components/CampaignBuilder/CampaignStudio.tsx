@@ -246,28 +246,42 @@ export function CampaignStudio() {
     setGeneratingImages(true);
     setGeneratedImages(imagesToGenerate.map((image) => ({ ...image, status: "generating" })));
 
-    const response = await fetch("/api/images/generate", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        images: imagesToGenerate
-      })
-    });
-    const body = (await response.json()) as { images?: GeneratedImage[] };
+    try {
+      const response = await fetch("/api/images/generate", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          images: imagesToGenerate
+        })
+      });
+      const body = (await response.json().catch(() => ({}))) as { images?: GeneratedImage[]; error?: string };
 
-    if (body.images?.length) {
-      setGeneratedImages(body.images);
-      setSelectedImageId(body.images.find((image) => image.imageUrl)?.id ?? null);
-      setDriveExport(null);
-    } else {
+      if (!response.ok) {
+        throw new Error(body.error ?? `Image generation returned HTTP ${response.status}.`);
+      }
+
+      if (body.images?.length) {
+        setGeneratedImages(body.images);
+        setSelectedImageId(body.images.find((image) => image.imageUrl)?.id ?? null);
+        setDriveExport(null);
+      } else {
+        setGeneratedImages((current) =>
+          current.map((image) => ({ ...image, status: "failed", error: "Image generation did not return images." }))
+        );
+      }
+    } catch (error) {
       setGeneratedImages((current) =>
-        current.map((image) => ({ ...image, status: "failed", error: "Image generation did not return images." }))
+        current.map((image) => ({
+          ...image,
+          status: "failed",
+          error: error instanceof Error ? error.message : "Image generation request failed."
+        }))
       );
+    } finally {
+      setGeneratingImages(false);
     }
-
-    setGeneratingImages(false);
   }
 
   async function generateSimilarImages() {
@@ -293,28 +307,42 @@ export function CampaignStudio() {
     setSelectedImageId(null);
     setDraft(null);
 
-    const response = await fetch("/api/images/generate", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        images: similarBriefs
-      })
-    });
-    const body = (await response.json()) as { images?: GeneratedImage[] };
+    try {
+      const response = await fetch("/api/images/generate", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          images: similarBriefs
+        })
+      });
+      const body = (await response.json().catch(() => ({}))) as { images?: GeneratedImage[]; error?: string };
 
-    if (body.images?.length) {
-      setGeneratedImages(body.images);
-      setSelectedImageId(body.images.find((image) => image.imageUrl)?.id ?? null);
-      setDriveExport(null);
-    } else {
+      if (!response.ok) {
+        throw new Error(body.error ?? `Similar image generation returned HTTP ${response.status}.`);
+      }
+
+      if (body.images?.length) {
+        setGeneratedImages(body.images);
+        setSelectedImageId(body.images.find((image) => image.imageUrl)?.id ?? null);
+        setDriveExport(null);
+      } else {
+        setGeneratedImages((current) =>
+          current.map((image) => ({ ...image, status: "failed", error: "Similar image generation did not return images." }))
+        );
+      }
+    } catch (error) {
       setGeneratedImages((current) =>
-        current.map((image) => ({ ...image, status: "failed", error: "Similar image generation did not return images." }))
+        current.map((image) => ({
+          ...image,
+          status: "failed",
+          error: error instanceof Error ? error.message : "Similar image generation request failed."
+        }))
       );
+    } finally {
+      setGeneratingImages(false);
     }
-
-    setGeneratingImages(false);
   }
 
   return (

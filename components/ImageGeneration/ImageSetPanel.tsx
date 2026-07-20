@@ -28,6 +28,7 @@ export function ImageSetPanel({
   const [expandedImage, setExpandedImage] = useState<GeneratedImage | null>(null);
   const generatedImages = images.filter((image) => image.imageUrl);
   const failedImages = images.filter((image) => image.status === "failed");
+  const firstFailure = failedImages.find((image) => image.error)?.error;
   const canGenerateSimilar = generatedImages.some((image) => image.id === selectedImageId);
 
   return (
@@ -70,17 +71,19 @@ export function ImageSetPanel({
               ? "Generate three draft image options first. Create more only after a direction is worth exploring."
               : "No image thumbnails will appear here until image generation returns results."}
           </span>
-          {failedImages.length ? <small>{failedImages.length} image request failed. Regenerate when ready.</small> : null}
+          {failedImages.length ? (
+            <small>{firstFailure ?? `${failedImages.length} image request failed. Regenerate when ready.`}</small>
+          ) : null}
         </div>
       )}
 
       {images.length ? (
         <div className="image-actions">
-          <button className="primary-button image-generate-button" disabled={generating} onClick={onGenerateImages}>
+          <button className="primary-button image-generate-button" type="button" disabled={generating} onClick={onGenerateImages}>
             {generating ? "Generating 3 Draft Images..." : generatedImages.length ? "Regenerate 3 Draft Images" : "Generate 3 Draft Images"}
           </button>
           {generatedImages.length ? (
-            <button className="ghost-button image-generate-button" disabled={generating || !canGenerateSimilar} onClick={onGenerateSimilar}>
+            <button className="ghost-button image-generate-button" type="button" disabled={generating || !canGenerateSimilar} onClick={onGenerateSimilar}>
               Generate 3 More Like Selected
             </button>
           ) : null}

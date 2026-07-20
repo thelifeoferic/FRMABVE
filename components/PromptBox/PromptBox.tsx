@@ -105,9 +105,26 @@ export function PromptBox({
   const assets = value.assets ?? [];
   const productIds = value.productIds ?? [];
   const [localProductQuery, setLocalProductQuery] = useState(productQuery);
+  const [audienceQuery, setAudienceQuery] = useState("");
   const hasProductQuery = localProductQuery.trim().length > 0;
-  const visibleProducts = hasProductQuery ? products.slice(0, 8) : [];
+  const visibleProducts = hasProductQuery ? products.slice(0, 24) : [];
   const usesAlpineAudience = brand.id === "asheville-dispensary";
+  const selectedAudienceIds = value.audienceId
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+  const selectedAudiences = audiences.filter((audience) => selectedAudienceIds.includes(audience.id));
+  const filteredAudiences = audiences
+    .filter((audience) => {
+      const query = audienceQuery.trim().toLowerCase();
+
+      if (!query) return true;
+
+      return [audience.name, audience.id, audience.description]
+        .filter(Boolean)
+        .some((field) => field?.toLowerCase().includes(query));
+    })
+    .slice(0, 24);
   const productStatus = loadingProducts
     ? "Searching"
     : hasProductQuery
@@ -135,12 +152,26 @@ export function PromptBox({
     onChange({ ...value, [field]: nextValue });
   }
 
-  function selectAudience(audienceId: string) {
-    const audience = audiences.find((item) => item.id === audienceId);
+  function toggleAudience(audience: AudienceSegment) {
+    const nextIds = selectedAudienceIds.includes(audience.id)
+      ? selectedAudienceIds.filter((id) => id !== audience.id)
+      : [...selectedAudienceIds, audience.id];
+    const nextAudiences = audiences.filter((item) => nextIds.includes(item.id));
+
     onChange({
       ...value,
-      audienceId,
-      audience: audience?.name ?? value.audience
+      audienceId: nextIds.join(", "),
+      klaviyoAudienceId: nextIds.join(", "),
+      audience: nextAudiences.map((item) => item.name).join(", ")
+    });
+  }
+
+  function clearAudiences() {
+    onChange({
+      ...value,
+      audienceId: "",
+      klaviyoAudienceId: "",
+      audience: ""
     });
   }
 
@@ -227,24 +258,58 @@ export function PromptBox({
 
       {usesAlpineAudience ? (
         <div className="integration-grid">
-          <label>
+          <div className="audience-picker">
             Alpine IQ Audience
-            <select value={value.audienceId} onChange={(event) => selectAudience(event.target.value)}>
-              <option value="">
-                {loadingAudiences
-                  ? "Loading audiences..."
-                  : audiences.length
-                    ? "Select audience"
-                    : "No Alpine IQ audiences loaded"}
-              </option>
-              {audiences.map((audience) => (
-                <option key={audience.id} value={audience.id}>
-                  {audience.name}
-                  {audience.memberCount ? ` (${audience.memberCount.toLocaleString()})` : ""}
-                </option>
+            <div className="audience-search-row">
+              <input
+                className="audience-search"
+                value={audienceQuery}
+                onChange={(event) => setAudienceQuery(event.target.value)}
+                placeholder={
+                  loadingAudiences
+                    ? "Loading Alpine IQ audiences..."
+                    : audiences.length
+                      ? "Search audiences by name or ID"
+                      : "No Alpine IQ audiences loaded"
+                }
+              />
+              {selectedAudienceIds.length ? (
+                <button className="icon-text-button" type="button" onClick={clearAudiences}>
+                  Clear
+                </button>
+              ) : null}
+            </div>
+            {selectedAudiences.length ? (
+              <div className="selected-audiences" aria-label="Selected audiences">
+                {selectedAudiences.map((audience) => (
+                  <button
+                    className="selected-audience-chip"
+                    key={audience.id}
+                    type="button"
+                    onClick={() => toggleAudience(audience)}
+                  >
+                    {audience.name}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            <div className="audience-options" aria-label="Alpine IQ audience results">
+              {filteredAudiences.map((audience) => (
+                <button
+                  key={audience.id}
+                  className={selectedAudienceIds.includes(audience.id) ? "audience-option selected" : "audience-option"}
+                  type="button"
+                  onClick={() => toggleAudience(audience)}
+                >
+                  <strong>{audience.name}</strong>
+                  <span>
+                    {audience.id}
+                    {audience.memberCount ? ` / ${audience.memberCount.toLocaleString()} members` : ""}
+                  </span>
+                </button>
               ))}
-            </select>
-          </label>
+            </div>
+          </div>
           {audienceStatus ? <div className="audience-status">{audienceStatus}</div> : null}
         </div>
       ) : (

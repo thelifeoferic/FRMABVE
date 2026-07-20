@@ -2,6 +2,11 @@ import type { BrandId, ProductOption } from "@/lib/types/campaign";
 
 const PRODUCT_SOURCE_URL = "https://avldispensary.com/";
 const STORE_PRODUCTS_URL = "https://avldispensary.com/wp-json/wc/store/v1/products";
+const PRODUCT_SITEMAP_URLS = [
+  "https://avldispensary.com/product-sitemap.xml",
+  "https://avldispensary.com/product-sitemap1.xml"
+];
+const PRODUCT_PAGE_LIMIT = 8;
 
 const fallbackProducts: ProductOption[] = [
   {
@@ -107,6 +112,22 @@ type StoreProduct = {
   categories?: Array<{ name: string }>;
 };
 
+function matchesQuery(product: ProductOption, query: string) {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) return true;
+
+  return [product.name, product.category, product.price, product.url]
+    .filter(Boolean)
+    .some((value) => value?.toLowerCase().includes(normalizedQuery));
+}
+
+function dedupeProducts(products: ProductOption[]) {
+  return Array.from(
+    new Map(products.map((product) => [product.url || product.id || slugify(product.name), product])).values()
+  );
+}
+
 function formatStorePrice(product: StoreProduct) {
   const price = product.prices?.price;
 
@@ -120,10 +141,10 @@ function formatStorePrice(product: StoreProduct) {
   return Number.isFinite(amount) ? `${prefix}${amount.toFixed(2)}${suffix}` : undefined;
 }
 
-async function getStoreProducts(query: string): Promise<ProductOption[]> {
+async function getStoreProductPage(query: string, page: number): Promise<ProductOption[]> {
   const url = new URL(STORE_PRODUCTS_URL);
   url.searchParams.set("per_page", "100");
-  url.searchParams.set("page", "1");
+  url.searchParams.set("page", String(page));
 
   if (query) {
     url.searchParams.set("search", query);
@@ -153,14 +174,74 @@ async function getStoreProducts(query: string): Promise<ProductOption[]> {
   }));
 }
 
+async function getStoreProducts(query: string): Promise<ProductOption[]> {
+  const directSearchPages = await Promise.all(
+    Array.from({ length: PRODUCT_PAGE_LIMIT }, (_, index) => getStoreProductPage(query, index + 1).catch(() => []))
+  );
+  const directSearchProducts = dedupeProducts(directSearchPages.flat());
+
+  if (directSearchProducts.length >= 12 || !query.trim()) {
+    return directSearchProducts.filter((product) => matchesQuery(product, query));
+  }
+
+  const allProductPages = await Promise.all(
+    Array.from({ length: PRODUCT_PAGE_LIMIT }, (_, index) => getStoreProductPage("", index + 1).catch(() => []))
+  );
+  const allProducts = dedupeProducts([...directSearchProducts, ...allProductPages.flat()]);
+
+  return allProducts.filter((product) => matchesQuery(product, query));
+}
+
+async function getSitemapProducts(query: string): Promise<ProductOption[]> {
+  const sitemapResponses = await Promise.all(
+    PRODUCT_SITEMAP_URLS.map(async (sitemapUrl) => {
+      const response = await fetch(sitemapUrl, {
+        next: { revalidate: 3600 },
+        headers: {
+          accept: "application/xml,text/xml",
+          "user-agent": "Asheville Campaign Studio sitemap product importer"
+        }
+      });
+
+      return response.ok ? response.text() : "";
+    })
+  );
+  const urls = sitemapResponses
+    .flatMap((xml) => Array.from(xml.matchAll(/<loc>(.*?)<\/loc>/gi)).map((match) => decodeEntities(match[1])))
+    .filter((url) => url.includes("/product/"));
+  const products = urls.map((url) => {
+    const slug = url
+      .replace(/\/$/, "")
+      .split("/")
+      .filter(Boolean)
+      .pop() ?? "";
+    const name = slug
+      .split("-")
+      .filter(Boolean)
+      .map((part) => (part.toLowerCase() === "thca" ? "THCA" : part.charAt(0).toUpperCase() + part.slice(1)))
+      .join(" ");
+
+    return {
+      id: slug || slugify(name),
+      name,
+      source: "asheville-dispensary" as const,
+      category: name.toLowerCase().includes("flower") ? "Flower" : "Website",
+      url
+    };
+  });
+
+  return dedupeProducts(products).filter((product) => matchesQuery(product, query));
+}
+
 export async function getAshevilleProducts(query = ""): Promise<ProductOption[]> {
   const trimmedQuery = query.trim();
 
   try {
     const storeProducts = await getStoreProducts(trimmedQuery);
+    const sitemapProducts = await getSitemapProducts(trimmedQuery).catch(() => []);
 
     if (storeProducts.length) {
-      return storeProducts;
+      return dedupeProducts([...storeProducts, ...sitemapProducts]).slice(0, 200);
     }
 
     const response = await fetch(PRODUCT_SOURCE_URL, {
@@ -199,9 +280,14 @@ export async function getAshevilleProducts(query = ""): Promise<ProductOption[]>
       ? deduped.filter((product) => product.name.toLowerCase().includes(trimmedQuery.toLowerCase()))
       : deduped;
 
-    return filtered.length ? filtered.slice(0, 100) : fallbackProducts;
+    return filtered.length ? filtered.slice(0, 200) : fallbackProducts;
   } catch {
-    return fallbackProducts;
+    try {
+      const sitemapProducts = await getSitemapProducts(trimmedQuery);
+      return sitemapProducts.length ? sitemapProducts.slice(0, 200) : fallbackProducts;
+    } catch {
+      return fallbackProducts;
+    }
   }
 }
 
