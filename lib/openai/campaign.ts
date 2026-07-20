@@ -23,6 +23,8 @@ export function createMockKlaviyoFields(input: CampaignInput) {
   const audience = input.audience.trim();
 
   return {
+    campaignName: input.campaignName || `${product} ${offer || "Campaign"}`,
+    cta: input.cta || brand.sample.cta,
     subjectLine: offer ? `${offer} on ${product}` : `Fresh picks from ${product}`,
     previewText: audience
       ? `Built for ${audience.toLowerCase()}: ${input.notes || `shop the latest ${brand.name} campaign.`}`

@@ -208,19 +208,17 @@ async function resolveKlaviyoAudience(input: CampaignInput): Promise<KlaviyoAudi
     };
   }
 
-  if (input.audienceId && !input.audienceId.startsWith("sample-")) {
+  const fallbackAudienceId = getServerEnv("KLAVIYO_TEST_AUDIENCE_ID")?.trim();
+
+  if (fallbackAudienceId) {
     return {
-      id: input.audienceId,
-      name: input.audience || input.audienceId,
-      source: "selected"
+      id: fallbackAudienceId,
+      name: input.audience ? `${input.audience} / Klaviyo ${fallbackAudienceId}` : `Klaviyo Test Audience ${fallbackAudienceId}`,
+      source: "test-fallback"
     };
   }
 
-  return {
-    id: getServerEnv("KLAVIYO_TEST_AUDIENCE_ID") ?? "320400",
-    name: "Klaviyo Test Audience 320400",
-    source: "test-fallback"
-  };
+  throw new Error("Add a Klaviyo list or segment ID before creating the draft.");
 }
 
 export async function createKlaviyoDraft({ input, strategy, concept, generatedImages }: DraftRequest): Promise<KlaviyoDraft> {

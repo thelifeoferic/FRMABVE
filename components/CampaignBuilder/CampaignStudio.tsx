@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApprovalPanel } from "@/components/ApprovalPanel/ApprovalPanel";
 import { ImageSetPanel } from "@/components/ImageGeneration/ImageSetPanel";
+import { KlaviyoFieldsPanel } from "@/components/KlaviyoFields/KlaviyoFieldsPanel";
 import { PromptBox } from "@/components/PromptBox/PromptBox";
 import { SocialKitPanel } from "@/components/SocialKit/SocialKitPanel";
 import { campaignBrands, getCampaignBrand } from "@/lib/brand/default-brand";
@@ -66,7 +67,7 @@ export function CampaignStudio() {
   const [exportingDrive, setExportingDrive] = useState(false);
   const [generatingImages, setGeneratingImages] = useState(false);
   const promptRef = useRef<HTMLDivElement>(null);
-  const packageRef = useRef<HTMLDivElement>(null);
+  const fieldsRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<HTMLDivElement>(null);
   const draftRef = useRef<HTMLDivElement>(null);
 
@@ -75,6 +76,7 @@ export function CampaignStudio() {
     concepts.find((concept) => concept.name === generatedImages.find((image) => image.id === selectedImageId)?.style) ??
     null;
   const selectedImage = generatedImages.find((image) => image.id === selectedImageId) ?? null;
+  const activeStepIndex = draft ? 4 : selectedImage ? 3 : strategy ? 1 : 0;
 
   useEffect(() => {
     async function loadAudiences() {
@@ -145,11 +147,13 @@ export function CampaignStudio() {
     const nextFields = createMockKlaviyoFields(input);
     const nextInput = {
       ...input,
+      campaignName: input.campaignName || nextFields.campaignName,
       fromName: input.fromName || selectedBrand.sample.fromName,
       fromEmail: input.fromEmail || selectedBrand.sample.fromEmail,
       replyToEmail: input.replyToEmail || selectedBrand.sample.replyToEmail,
       subjectLine: input.subjectLine || nextFields.subjectLine,
-      previewText: input.previewText || nextFields.previewText
+      previewText: input.previewText || nextFields.previewText,
+      cta: input.cta || nextFields.cta
     };
     setStrategy(nextStrategy);
     const nextImages = createMockImageSet(nextInput, nextStrategy, concepts);
@@ -161,7 +165,7 @@ export function CampaignStudio() {
     setDriveExport(null);
 
     window.requestAnimationFrame(() => {
-      packageRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      fieldsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 
@@ -169,8 +173,10 @@ export function CampaignStudio() {
     const nextFields = createMockKlaviyoFields(input);
     setInput((current) => ({
       ...current,
+      campaignName: nextFields.campaignName,
       subjectLine: nextFields.subjectLine,
-      previewText: nextFields.previewText
+      previewText: nextFields.previewText,
+      cta: nextFields.cta
     }));
     setDraft(null);
     setDriveExport(null);
@@ -179,7 +185,7 @@ export function CampaignStudio() {
   function scrollToStep(step: string) {
     const refs: Record<string, RefObject<HTMLElement | HTMLDivElement | null>> = {
       Brief: promptRef,
-      "Klaviyo Fields": promptRef,
+      "Klaviyo Fields": fieldsRef,
       Images: imagesRef,
       Review: draftRef,
       "Klaviyo Draft": draftRef
@@ -315,10 +321,11 @@ export function CampaignStudio() {
     <main className="studio-shell" data-brand={selectedBrand.id}>
       <header className="topbar">
         <img src={selectedBrand.heroSrc} alt={selectedBrand.heroAlt} />
+        <img className="hero-brand-logo" src={selectedBrand.logoSrc} alt={`${selectedBrand.name} logo`} />
         <div className="hero-copy">
           <div className="brand-selector" aria-label="Brand selector">
             <label>
-              Brand
+              <span className="sr-only">Choose brand</span>
               <select aria-label="Brand" value={input.brandId} onChange={(event) => selectBrand(event.target.value as BrandId)}>
                 {Object.values(campaignBrands).map((brand) => (
                   <option key={brand.id} value={brand.id}>
@@ -328,15 +335,8 @@ export function CampaignStudio() {
               </select>
             </label>
           </div>
-          <p className="eyebrow">{selectedBrand.name}</p>
           <h1>Campaign Studio</h1>
           <p>{selectedBrand.promise}</p>
-          <div className="hero-stats" aria-label="Workflow summary">
-            <span>Audience</span>
-            <span>Products</span>
-            <span>Creative</span>
-            <span>Draft</span>
-          </div>
         </div>
       </header>
 
@@ -344,15 +344,18 @@ export function CampaignStudio() {
         {steps.map((step, index) => (
           <button
             key={step}
-            className={index <= (draft ? 4 : selectedConcept ? 3 : strategy ? 2 : 0) ? "active" : ""}
+            className={index <= activeStepIndex ? "active" : ""}
             type="button"
             onClick={() => scrollToStep(step)}
           >
             {step}
           </button>
         ))}
-        <a className="stepper-link" href="/settings">
+        <a className="stepper-link" href={`/settings?brand=${selectedBrand.id === "asheville-dispensary" ? "asheville" : "plant-bar"}`}>
           Brand Kit
+        </a>
+        <a className="stepper-link" href={`/prompts?brand=${selectedBrand.id === "asheville-dispensary" ? "asheville" : "plant-bar"}`}>
+          AI Prompts
         </a>
       </nav>
 
@@ -369,12 +372,31 @@ export function CampaignStudio() {
             brand={selectedBrand}
             onChange={setInput}
             onGenerate={generateStrategy}
-            onGenerateFields={generateKlaviyoFields}
             onProductSearch={searchProducts}
           />
         </div>
 
-        <div className="right-column" ref={packageRef}>
+        <div className="right-column">
+          <div ref={fieldsRef}>
+            {strategy ? (
+              <KlaviyoFieldsPanel
+                value={input}
+                brand={selectedBrand}
+                onChange={setInput}
+                onGenerateFields={generateKlaviyoFields}
+              />
+            ) : (
+              <section className="panel klaviyo-review-panel klaviyo-review-empty" aria-label="Klaviyo fields">
+                <div className="section-heading">
+                  <p>Klaviyo Fields</p>
+                  <span>Waiting for package</span>
+                </div>
+                <strong>Generate the campaign package first.</strong>
+                <p>Subject, preview, CTA, campaign name, and sender fields will appear here for review.</p>
+              </section>
+            )}
+          </div>
+
           <div ref={imagesRef}>
             <ImageSetPanel
               images={generatedImages}

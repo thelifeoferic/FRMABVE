@@ -30,13 +30,13 @@ export function SocialKitPanel({
         <div className="social-kit-copy">
           <strong>Keep the approved creative backed up.</strong>
           <p>
-            Save the selected campaign image as the source asset, then prepare matching Story and Feed versions for the same campaign.
+            Save the selected campaign image to Google Drive, then prepare matching Instagram Story and Instagram Post versions.
           </p>
         </div>
 
         <div className="social-kit-actions">
-          <button className="ghost-button" type="button" disabled={!ready || exporting} onClick={onBackupSelected}>
-            {exporting ? "Preparing Drive..." : "Backup Selected Image"}
+          <button className="ghost-button drive-download-button" type="button" disabled={!ready || exporting} onClick={onBackupSelected}>
+            {exporting ? "Preparing Drive..." : "Google Drive"}
           </button>
           <button className="primary-button" type="button" disabled={!ready || exporting} onClick={onCreateSocialKit}>
             {exporting ? "Preparing Social Kit..." : "Create Social Kit + Drive Backup"}
@@ -46,8 +46,8 @@ export function SocialKitPanel({
 
       <div className="social-kit-formats" aria-label="Social kit formats">
         <span>Source image</span>
-        <span>Story 1080 x 1920</span>
-        <span>Feed 1080 x 1080</span>
+        <span>Instagram Story</span>
+        <span>Instagram Post</span>
       </div>
 
       {driveExport ? (

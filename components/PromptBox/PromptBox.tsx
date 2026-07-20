@@ -15,7 +15,6 @@ type PromptBoxProps = {
   brand: CampaignBrand;
   onChange: (next: CampaignInput) => void;
   onGenerate: () => void;
-  onGenerateFields: () => void;
   onProductSearch: (query: string) => void;
 };
 
@@ -100,7 +99,6 @@ export function PromptBox({
   brand,
   onChange,
   onGenerate,
-  onGenerateFields,
   onProductSearch
 }: PromptBoxProps) {
   const assets = value.assets ?? [];
@@ -221,70 +219,10 @@ export function PromptBox({
         />
       </label>
 
-      <div className="brief-meta">
-        <label>
-          Campaign name
-          <input value={value.campaignName} onChange={(event) => update("campaignName", event.target.value)} placeholder="Optional" />
-        </label>
-        <label>
-          Offer
-          <input value={value.offer} onChange={(event) => update("offer", event.target.value)} placeholder="Optional" />
-        </label>
-      </div>
-
-      <div className="klaviyo-fields">
-        <div className="section-heading compact-heading">
-          <p>Klaviyo Fields</p>
-          <span>Draft fields v2</span>
-        </div>
-        <button className="ghost-button" type="button" onClick={onGenerateFields}>
-          AI generate
-        </button>
-        <div className="brief-meta">
-          <label>
-            From name
-            <input
-              value={value.fromName}
-              onChange={(event) => update("fromName", event.target.value)}
-              placeholder={brand.sample.fromName}
-            />
-          </label>
-          <label>
-            From email
-            <input
-              value={value.fromEmail}
-              onChange={(event) => update("fromEmail", event.target.value)}
-              placeholder={brand.sample.fromEmail}
-              readOnly={brand.id === "asheville-dispensary"}
-            />
-          </label>
-        </div>
-        <label>
-          Reply-to email
-          <input
-            value={value.replyToEmail}
-            onChange={(event) => update("replyToEmail", event.target.value)}
-            placeholder={brand.sample.replyToEmail}
-            readOnly={brand.id === "asheville-dispensary"}
-          />
-        </label>
-        <label>
-          Subject line
-          <input
-            value={value.subjectLine}
-            onChange={(event) => update("subjectLine", event.target.value)}
-            placeholder="Example: Buy 2 Get 1 on SOHI Social Gummies"
-          />
-        </label>
-        <label>
-          Preview text
-          <input
-            value={value.previewText}
-            onChange={(event) => update("previewText", event.target.value)}
-            placeholder="Example: A relaxed edible campaign for weekend discovery."
-          />
-        </label>
-      </div>
+      <label className="offer-field">
+        Offer
+        <input value={value.offer} onChange={(event) => update("offer", event.target.value)} placeholder="Example: 10% off this spring" />
+      </label>
 
       {usesAlpineAudience ? (
         <div className="integration-grid">

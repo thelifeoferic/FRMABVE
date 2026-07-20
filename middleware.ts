@@ -8,18 +8,13 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (
-    pathname === "/" ||
-    pathname === "/nest" ||
-    pathname.startsWith("/nest/") ||
     pathname === "/login" ||
-    pathname === "/asheville/login" ||
     pathname === "/api/login" ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/brand-imagery") ||
     pathname.startsWith("/brand-kit") ||
     pathname.startsWith("/logos") ||
     pathname.startsWith("/products") ||
-    pathname.startsWith("/nest-assets") ||
     PUBLIC_FILE.test(pathname)
   ) {
     return NextResponse.next();
@@ -28,7 +23,7 @@ export async function middleware(request: NextRequest) {
   const isLoggedIn = await isValidSessionToken(request.cookies.get(SESSION_COOKIE)?.value);
 
   if (!isLoggedIn) {
-    return NextResponse.redirect(new URL("/asheville/login", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();

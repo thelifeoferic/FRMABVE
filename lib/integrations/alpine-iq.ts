@@ -28,6 +28,7 @@ const sampleAudiences: AudienceSegment[] = [
 type AlpineAudienceRecord = {
   id?: string;
   _id?: string;
+  uuid?: string;
   segmentId?: string;
   segment_id?: string;
   listId?: string;
@@ -37,9 +38,13 @@ type AlpineAudienceRecord = {
   name?: string;
   title?: string;
   label?: string;
+  displayName?: string;
+  display_name?: string;
   count?: number;
   memberCount?: number;
   member_count?: number;
+  customerCount?: number;
+  customer_count?: number;
   total?: number;
   description?: string;
 };
@@ -54,13 +59,14 @@ function normalizeRecord(record: AlpineAudienceRecord): AudienceSegment | null {
   const id =
     record.id ??
     record._id ??
+    record.uuid ??
     record.segmentId ??
     record.segment_id ??
     record.listId ??
     record.list_id ??
     record.audienceId ??
     record.audience_id;
-  const name = record.name ?? record.title ?? record.label;
+  const name = record.name ?? record.title ?? record.label ?? record.displayName ?? record.display_name;
 
   if (!id || !name) {
     return null;
@@ -70,9 +76,54 @@ function normalizeRecord(record: AlpineAudienceRecord): AudienceSegment | null {
     id: String(id),
     name,
     source: "alpine-iq",
-    memberCount: record.memberCount ?? record.member_count ?? record.count ?? record.total,
+    memberCount:
+      record.memberCount ?? record.member_count ?? record.customerCount ?? record.customer_count ?? record.count ?? record.total,
     description: record.description
   };
+}
+
+function getEndpointCandidates() {
+  const configuredEndpoints = getServerEnv("ALPINE_IQ_AUDIENCES_ENDPOINTS");
+  const legacyEndpoint = getServerEnv("ALPINE_IQ_AUDIENCES_ENDPOINT");
+  const endpointList = configuredEndpoints ?? [legacyEndpoint, "audiences", "segments", "lists"].filter(Boolean).join(",");
+
+  return endpointList
+    .split(",")
+    .map((endpoint) => endpoint.trim())
+    .filter((endpoint, index, endpoints) => endpoint && endpoints.indexOf(endpoint) === index);
+}
+
+function extractRecords(body: unknown): AlpineAudienceRecord[] {
+  if (Array.isArray(body)) {
+    return body as AlpineAudienceRecord[];
+  }
+
+  if (!body || typeof body !== "object") {
+    return [];
+  }
+
+  const responseBody = body as Record<string, unknown>;
+  const possibleArrays = [
+    responseBody.data,
+    responseBody.segments,
+    responseBody.audiences,
+    responseBody.lists,
+    responseBody.results,
+    responseBody.items,
+    responseBody.records
+  ];
+
+  for (const possibleArray of possibleArrays) {
+    if (Array.isArray(possibleArray)) {
+      return possibleArray as AlpineAudienceRecord[];
+    }
+  }
+
+  if (responseBody.result && typeof responseBody.result === "object") {
+    return extractRecords(responseBody.result);
+  }
+
+  return [];
 }
 
 function parseAlpineMessage(body: unknown): string | undefined {
@@ -101,15 +152,12 @@ function parseAlpineMessage(body: unknown): string | undefined {
 
 export async function getAlpineAudienceResult(): Promise<AlpineAudienceResult> {
   const alpineIqUid = getServerEnv("ALPINE_IQ_UID");
-  const endpoint = getServerEnv("ALPINE_IQ_AUDIENCES_ENDPOINT") ?? "audiences";
-  const apiUrl =
-    getServerEnv("ALPINE_IQ_AUDIENCES_URL") ??
-    (alpineIqUid
-      ? `${getServerEnv("ALPINE_IQ_BASE_URL") ?? "https://lab.alpineiq.com/api/v1.1"}/${endpoint}/${alpineIqUid}`
-      : undefined);
   const apiKey = getServerEnv("ALPINE_IQ_API_KEY");
+  const explicitApiUrl = getServerEnv("ALPINE_IQ_AUDIENCES_URL");
+  const baseUrl = getServerEnv("ALPINE_IQ_BASE_URL") ?? "https://lab.alpineiq.com/api/v1.1";
+  const endpointCandidates = explicitApiUrl ? ["custom-url"] : getEndpointCandidates();
 
-  if (!apiUrl || !apiKey) {
+  if ((!explicitApiUrl && !alpineIqUid) || !apiKey) {
     return {
       audiences: sampleAudiences,
       status: "sample",
@@ -117,50 +165,63 @@ export async function getAlpineAudienceResult(): Promise<AlpineAudienceResult> {
     };
   }
 
-  try {
-    const response = await fetch(apiUrl, {
-      headers: {
-        accept: "application/json",
-        authorization: `Bearer ${apiKey}`,
-        "x-api-key": apiKey
-      },
-      cache: "no-store"
-    });
+  const attemptedEndpoints: string[] = [];
+  let lastMessage = "";
 
-    if (!response.ok) {
-      let message = `Alpine IQ returned ${response.status}.`;
+  for (const endpoint of endpointCandidates) {
+    const apiUrl = explicitApiUrl ?? `${baseUrl}/${endpoint}/${alpineIqUid}`;
+    attemptedEndpoints.push(endpoint);
 
-      try {
-        message = parseAlpineMessage(await response.json()) ?? message;
-      } catch {
-        // Keep the status-only message if Alpine does not return JSON.
+    try {
+      const response = await fetch(apiUrl, {
+        headers: {
+          accept: "application/json",
+          "X-APIKEY": apiKey
+        },
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        let message = `Alpine IQ returned ${response.status}.`;
+
+        try {
+          message = parseAlpineMessage(await response.json()) ?? message;
+        } catch {
+          // Keep the status-only message if Alpine does not return JSON.
+        }
+
+        lastMessage = `${message} Tried endpoint "${endpoint}" for UID ${alpineIqUid}.`;
+        continue;
+      }
+
+      const body = await response.json();
+      const records = extractRecords(body);
+      const audiences = records.map(normalizeRecord).filter(Boolean) as AudienceSegment[];
+
+      if (!audiences.length) {
+        lastMessage = `Connected to Alpine IQ, but endpoint "${endpoint}" returned no audience records.`;
+        continue;
       }
 
       return {
-        audiences: [],
-        status: "error",
-        message: `${message} Tried endpoint "${endpoint}" for UID ${alpineIqUid}.`
+        audiences,
+        status: "connected"
       };
+    } catch (error) {
+      lastMessage = `Could not reach endpoint "${endpoint}": ${
+        error instanceof Error ? error.message : "network request failed"
+      }.`;
+      continue;
     }
-
-    const body = await response.json();
-    const records = Array.isArray(body)
-      ? body
-      : body.data ?? body.segments ?? body.audiences ?? body.lists ?? body.results ?? [];
-    const audiences = records.map(normalizeRecord).filter(Boolean) as AudienceSegment[];
-
-    return {
-      audiences,
-      status: "connected",
-      message: audiences.length ? undefined : `Connected to Alpine IQ, but endpoint "${endpoint}" returned no audience records.`
-    };
-  } catch {
-    return {
-      audiences: [],
-      status: "error",
-      message: `Could not reach Alpine IQ endpoint "${endpoint}" for UID ${alpineIqUid}.`
-    };
   }
+
+  return {
+    audiences: [],
+    status: "error",
+    message:
+      lastMessage ||
+      `Could not load Alpine IQ audiences. Tried ${attemptedEndpoints.join(", ")} for UID ${alpineIqUid}.`
+  };
 }
 
 export async function getAlpineAudiences(): Promise<AudienceSegment[]> {

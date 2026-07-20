@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "From Above — AI Marketing Solutions",
-  description: "Practical AI systems for sharper campaigns, calmer operations and better customer experiences."
+  title: "Campaign Studio",
+  description: "Build Klaviyo-ready campaigns from audience, product, and brand data."
 };
 
 export default function RootLayout({
@@ -13,7 +13,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        {children}
+        <footer className="site-footer">frm.abve &copy; 2026</footer>
+      </body>
     </html>
   );
 }

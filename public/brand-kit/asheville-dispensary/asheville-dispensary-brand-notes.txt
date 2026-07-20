@@ -13,7 +13,10 @@ Color direction
 - Cherry accent: #671f34
 
 Typography direction
-- Bold, clear sans-serif for campaign fields and calls to action.
+- Primary brand font: Iskra W01.
+- Supporting brand font: Montserrat.
+- Use Iskra selectively for expressive brand headings and short display moments.
+- Use Montserrat for clean campaign fields, body copy, buttons, and utility text.
 - Keep copy compact and confident.
 
 Image direction
