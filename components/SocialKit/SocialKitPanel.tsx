@@ -18,6 +18,10 @@ export function SocialKitPanel({
   onCreateSocialKit
 }: SocialKitPanelProps) {
   const ready = Boolean(selectedImage?.imageUrl);
+  const destination = driveExport
+    ? `Google Drive / FRM ABVE Campaign Exports / ${driveExport.folderName}`
+    : "Google Drive / FRM ABVE Campaign Exports / campaign folder";
+  const outputFormats = driveExport?.assets.map((asset) => asset.format) ?? [];
 
   return (
     <section className="panel social-kit-panel" aria-label="Google Drive social kit">
@@ -32,6 +36,7 @@ export function SocialKitPanel({
           <p>
             Save the selected campaign image to Google Drive, then prepare matching Instagram Story and Instagram Post versions.
           </p>
+          <small>Destination: {destination}</small>
         </div>
 
         <div className="social-kit-actions">
@@ -44,17 +49,23 @@ export function SocialKitPanel({
         </div>
       </div>
 
-      <div className="social-kit-formats" aria-label="Social kit formats">
-        <span>Source image</span>
-        <span>Instagram Story</span>
-        <span>Instagram Post</span>
+      <div className="social-kit-formats" aria-label="Social kit outputs">
+        <span className={outputFormats.includes("selected-image") ? "ready" : ""}>Selected image</span>
+        <span className={outputFormats.includes("instagram-story") ? "ready" : ""}>Instagram Story</span>
+        <span className={outputFormats.includes("instagram-feed") ? "ready" : ""}>Instagram Post</span>
       </div>
 
       {driveExport ? (
         <div className="draft-ready drive-ready" role="status">
           <span>{driveExport.status === "uploaded" ? "Uploaded to Google Drive" : "Drive export staged"}</span>
           <strong>{driveExport.folderName}</strong>
+          <p>Destination: {destination}</p>
           <p>{driveExport.note}</p>
+          {driveExport.folderUrl ? (
+            <a href={driveExport.folderUrl} target="_blank" rel="noreferrer">
+              Open Drive folder
+            </a>
+          ) : null}
           <small>{driveExport.assets.map((asset) => `${asset.name} (${asset.dimensions})`).join(" / ")}</small>
         </div>
       ) : null}

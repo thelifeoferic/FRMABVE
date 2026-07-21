@@ -247,10 +247,12 @@ export function CampaignStudio() {
     setExportingDrive(false);
   }
 
-  async function generateImages() {
+  async function generateImages(style: GeneratedImage["style"]) {
     if (!generatedImages.length) return;
 
-    const imagesToGenerate = generatedImages.slice(0, economyImageCount);
+    const imagesToGenerate = generatedImages.filter((image) => image.style === style).slice(0, economyImageCount);
+
+    if (!imagesToGenerate.length) return;
 
     setGeneratingImages(true);
     setGeneratedImages(imagesToGenerate.map((image) => ({ ...image, status: "generating" })));
@@ -484,7 +486,6 @@ export function CampaignStudio() {
               selectedImageId={selectedImageId}
               includeLogo={input.includeLogo}
               generating={generatingImages}
-              brand={selectedBrand}
               onSelectImage={(image) => {
                 setSelectedImageId(image.id);
                 setSelectedConceptId(concepts.find((concept) => concept.name === image.style)?.id ?? null);

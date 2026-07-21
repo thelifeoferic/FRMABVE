@@ -149,7 +149,8 @@ export function createMockImageSet(
     { concept: concepts[1], version: "E", angle: "plant-led wellness detail" },
     { concept: concepts[1], version: "F", angle: "soft lifestyle wellness tabletop" },
     { concept: concepts[2], version: "G", angle: "warm lounge occasion" },
-    { concept: concepts[2], version: "H", angle: "human discovery moment" }
+    { concept: concepts[2], version: "H", angle: "human discovery moment" },
+    { concept: concepts[2], version: "I", angle: "social lifestyle campaign with clear conversion space" }
   ];
 
   return imagePlan.map(({ concept, version, angle }) => {
@@ -172,6 +173,9 @@ export function createMockImageSet(
         input.includeLogo
           ? brand.logoPrompt
           : `Do not include the ${brand.name} logo in the generated image.`,
+        input.includeLogo
+          ? "Do not place a logo as an afterthought or floating sticker; compose the image so the brand mark has a natural, intentional home in the layout."
+          : "",
         assetSummary ? `Use these analyzed visual references: ${assetSummary}` : "",
         input.assetNotes ? `Reference notes: ${input.assetNotes}` : "Use attached assets as brand and product references."
       ]

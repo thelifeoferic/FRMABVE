@@ -77,7 +77,7 @@ export type VisualConcept = {
 export type GeneratedImage = {
   id: string;
   style: "Product" | "Wellness" | "Lifestyle";
-  version: "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H";
+  version: "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I";
   status: "preview" | "brief-ready" | "generating" | "generated" | "failed" | "approved";
   prompt: string;
   altText: string;
