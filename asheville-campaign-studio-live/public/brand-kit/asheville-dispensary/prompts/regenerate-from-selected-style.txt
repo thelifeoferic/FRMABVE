@@ -1,9 +1,0 @@
-Asheville Dispensary Regenerate From Selected Style
-
-When an image is selected, future generations should preserve that image's composition/style while varying details.
-
-Treat the selected image as the approved visual direction. Preserve its core framing, product scale, mood, lighting style, background language, color balance, depth, hierarchy, and overall campaign tone.
-
-Vary only controlled details such as crop, prop placement, product angle, background texture, lighting nuance, secondary visual cues, and copy treatment.
-
-Do not drift into a different art direction, palette, package treatment, illustration style, or layout system unless the user explicitly requests a new direction.
