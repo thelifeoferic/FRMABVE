@@ -1,0 +1,9 @@
+Asheville Dispensary Asset Respect Rule
+
+Uploaded assets are references/source material.
+
+Do not reinterpret logos or packaging unless explicitly asked. Do not redraw, rename, recolor, crop, distort, simplify, or replace visible brand marks, package shapes, labels, product names, flavor cues, compliance text, or other identifying details.
+
+Use uploaded assets to preserve accurate visual direction: product identity, logo placement, color cues, packaging structure, material finish, label hierarchy, and composition notes.
+
+If an asset is low-resolution, partially cropped, or unclear, preserve what is visible and flag uncertain details for human review instead of inventing replacements.
