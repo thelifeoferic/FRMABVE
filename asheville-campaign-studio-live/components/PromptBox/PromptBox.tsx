@@ -15,7 +15,7 @@ type PromptBoxProps = {
   brand: CampaignBrand;
   onChange: (next: CampaignInput) => void;
   onGenerate: () => void;
-  onGenerateFields: () => void;
+  onGenerateFields?: () => void;
   onProductSearch: (query: string) => void;
 };
 
@@ -100,15 +100,31 @@ export function PromptBox({
   brand,
   onChange,
   onGenerate,
-  onGenerateFields,
   onProductSearch
 }: PromptBoxProps) {
   const assets = value.assets ?? [];
   const productIds = value.productIds ?? [];
   const [localProductQuery, setLocalProductQuery] = useState(productQuery);
+  const [audienceQuery, setAudienceQuery] = useState("");
   const hasProductQuery = localProductQuery.trim().length > 0;
-  const visibleProducts = hasProductQuery ? products.slice(0, 8) : [];
+  const visibleProducts = hasProductQuery ? products.slice(0, 24) : [];
   const usesAlpineAudience = brand.id === "asheville-dispensary";
+  const selectedAudienceIds = value.audienceId
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+  const selectedAudiences = audiences.filter((audience) => selectedAudienceIds.includes(audience.id));
+  const filteredAudiences = audiences
+    .filter((audience) => {
+      const query = audienceQuery.trim().toLowerCase();
+
+      if (!query) return true;
+
+      return [audience.name, audience.id, audience.description]
+        .filter(Boolean)
+        .some((field) => field?.toLowerCase().includes(query));
+    })
+    .slice(0, 24);
   const productStatus = loadingProducts
     ? "Searching"
     : hasProductQuery
@@ -136,12 +152,26 @@ export function PromptBox({
     onChange({ ...value, [field]: nextValue });
   }
 
-  function selectAudience(audienceId: string) {
-    const audience = audiences.find((item) => item.id === audienceId);
+  function toggleAudience(audience: AudienceSegment) {
+    const nextIds = selectedAudienceIds.includes(audience.id)
+      ? selectedAudienceIds.filter((id) => id !== audience.id)
+      : [...selectedAudienceIds, audience.id];
+    const nextAudiences = audiences.filter((item) => nextIds.includes(item.id));
+
     onChange({
       ...value,
-      audienceId,
-      audience: audience?.name ?? value.audience
+      audienceId: nextIds.join(", "),
+      klaviyoAudienceId: nextIds.join(", "),
+      audience: nextAudiences.map((item) => item.name).join(", ")
+    });
+  }
+
+  function clearAudiences() {
+    onChange({
+      ...value,
+      audienceId: "",
+      klaviyoAudienceId: "",
+      audience: ""
     });
   }
 
@@ -221,91 +251,65 @@ export function PromptBox({
         />
       </label>
 
-      <div className="brief-meta">
-        <label>
-          Campaign name
-          <input value={value.campaignName} onChange={(event) => update("campaignName", event.target.value)} placeholder="Optional" />
-        </label>
-        <label>
-          Offer
-          <input value={value.offer} onChange={(event) => update("offer", event.target.value)} placeholder="Optional" />
-        </label>
-      </div>
-
-      <div className="klaviyo-fields">
-        <div className="section-heading compact-heading">
-          <p>Klaviyo Fields</p>
-          <span>Draft fields v2</span>
-        </div>
-        <button className="ghost-button" type="button" onClick={onGenerateFields}>
-          AI generate
-        </button>
-        <div className="brief-meta">
-          <label>
-            From name
-            <input
-              value={value.fromName}
-              onChange={(event) => update("fromName", event.target.value)}
-              placeholder={brand.sample.fromName}
-            />
-          </label>
-          <label>
-            From email
-            <input
-              value={value.fromEmail}
-              onChange={(event) => update("fromEmail", event.target.value)}
-              placeholder={brand.sample.fromEmail}
-              readOnly={brand.id === "asheville-dispensary"}
-            />
-          </label>
-        </div>
-        <label>
-          Reply-to email
-          <input
-            value={value.replyToEmail}
-            onChange={(event) => update("replyToEmail", event.target.value)}
-            placeholder={brand.sample.replyToEmail}
-            readOnly={brand.id === "asheville-dispensary"}
-          />
-        </label>
-        <label>
-          Subject line
-          <input
-            value={value.subjectLine}
-            onChange={(event) => update("subjectLine", event.target.value)}
-            placeholder="Example: Buy 2 Get 1 on SOHI Social Gummies"
-          />
-        </label>
-        <label>
-          Preview text
-          <input
-            value={value.previewText}
-            onChange={(event) => update("previewText", event.target.value)}
-            placeholder="Example: A relaxed edible campaign for weekend discovery."
-          />
-        </label>
-      </div>
+      <label className="offer-field">
+        Offer
+        <input value={value.offer} onChange={(event) => update("offer", event.target.value)} placeholder="Example: 10% off this spring" />
+      </label>
 
       {usesAlpineAudience ? (
         <div className="integration-grid">
-          <label>
+          <div className="audience-picker">
             Alpine IQ Audience
-            <select value={value.audienceId} onChange={(event) => selectAudience(event.target.value)}>
-              <option value="">
-                {loadingAudiences
-                  ? "Loading audiences..."
-                  : audiences.length
-                    ? "Select audience"
-                    : "No Alpine IQ audiences loaded"}
-              </option>
-              {audiences.map((audience) => (
-                <option key={audience.id} value={audience.id}>
-                  {audience.name}
-                  {audience.memberCount ? ` (${audience.memberCount.toLocaleString()})` : ""}
-                </option>
+            <div className="audience-search-row">
+              <input
+                className="audience-search"
+                value={audienceQuery}
+                onChange={(event) => setAudienceQuery(event.target.value)}
+                placeholder={
+                  loadingAudiences
+                    ? "Loading Alpine IQ audiences..."
+                    : audiences.length
+                      ? "Search audiences by name or ID"
+                      : "No Alpine IQ audiences loaded"
+                }
+              />
+              {selectedAudienceIds.length ? (
+                <button className="icon-text-button" type="button" onClick={clearAudiences}>
+                  Clear
+                </button>
+              ) : null}
+            </div>
+            {selectedAudiences.length ? (
+              <div className="selected-audiences" aria-label="Selected audiences">
+                {selectedAudiences.map((audience) => (
+                  <button
+                    className="selected-audience-chip"
+                    key={audience.id}
+                    type="button"
+                    onClick={() => toggleAudience(audience)}
+                  >
+                    {audience.name}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            <div className="audience-options" aria-label="Alpine IQ audience results">
+              {filteredAudiences.map((audience) => (
+                <button
+                  key={audience.id}
+                  className={selectedAudienceIds.includes(audience.id) ? "audience-option selected" : "audience-option"}
+                  type="button"
+                  onClick={() => toggleAudience(audience)}
+                >
+                  <strong>{audience.name}</strong>
+                  <span>
+                    {audience.id}
+                    {audience.memberCount ? ` / ${audience.memberCount.toLocaleString()} members` : ""}
+                  </span>
+                </button>
               ))}
-            </select>
-          </label>
+            </div>
+          </div>
           {audienceStatus ? <div className="audience-status">{audienceStatus}</div> : null}
         </div>
       ) : (
@@ -352,20 +356,26 @@ export function PromptBox({
         ) : null}
         {hasProductQuery ? (
           <div className="product-options">
-            {visibleProducts.map((product) => (
-              <button
-                key={product.id}
-                className={productIds.includes(product.id) ? "product-chip selected" : "product-chip"}
-                type="button"
-                onClick={() => toggleProduct(product)}
-              >
-                <strong>{product.name}</strong>
-                <span>
-                  {product.category ?? "Website"}
-                  {product.price ? ` / ${product.price}` : ""}
-                </span>
-              </button>
-            ))}
+            {visibleProducts.length ? (
+              visibleProducts.map((product) => (
+                <button
+                  key={product.id}
+                  className={productIds.includes(product.id) ? "product-chip selected" : "product-chip"}
+                  type="button"
+                  onClick={() => toggleProduct(product)}
+                >
+                  <strong>{product.name}</strong>
+                  <span>
+                    {product.category ?? "Website"}
+                    {product.price ? ` / ${product.price}` : ""}
+                  </span>
+                </button>
+              ))
+            ) : (
+              <div className="product-empty-state">
+                {loadingProducts ? "Searching Asheville Dispensary products..." : "No matching products found."}
+              </div>
+            )}
           </div>
         ) : null}
       </div>

@@ -50,7 +50,8 @@ export const campaignBrands: Record<BrandId, CampaignBrand> = {
     productSearchPlaceholder: "Start typing gummies, THCA, seltzer, tinctures...",
     productEmpty: "Start typing to pull matching Asheville Dispensary products.",
     imagePromptBrand: "Asheville Dispensary",
-    logoPrompt: "Include the Asheville Dispensary logo as a tasteful brand mark integrated into the design.",
+    logoPrompt:
+      "Plan the creative with an intentional Asheville Dispensary logo placement area. Use the provided Asheville Dispensary logo exactly as shown when it is supplied as an asset; do not redraw, crop, recolor, distort, replace, or modify the logo. Keep the mark fully visible with generous safe space and preserve its original aspect ratio.",
     imageGuidelines: [
       "Use a premium cannabis apothecary look with cream, black, deep green, and warm gold.",
       "Keep product packaging readable, centered, and fully inside the image with generous margin.",
@@ -87,7 +88,8 @@ export const campaignBrands: Record<BrandId, CampaignBrand> = {
     productSearchPlaceholder: "Start typing coffee, boba, tea, zero-proof...",
     productEmpty: "Start typing to pull matching Plant Bar offerings.",
     imagePromptBrand: "Plant Bar",
-    logoPrompt: "Include the Plant Bar logo as a tasteful brand mark integrated into the design.",
+    logoPrompt:
+      "Plan the creative with an intentional Plant Bar logo placement area. Use the provided Plant Bar logo exactly as shown when it is supplied as an asset; do not redraw, crop, recolor, distort, replace, or modify the logo. Keep the mark fully visible with generous safe space and preserve its original aspect ratio.",
     imageGuidelines: [
       "Honor the Plant Bar guide: soft mint backgrounds, blush pink brand energy, deep navy contrast, cocoa-brown warmth, and tea/coffee amber accents.",
       "Use an editorial cafe and botanical beverage style: specialty coffee, tea, boba, zero-proof cocktails, glassware, garnish, texture, and warm human connection.",

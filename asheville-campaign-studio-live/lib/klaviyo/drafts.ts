@@ -41,6 +41,13 @@ function getSender(input: CampaignInput) {
   };
 }
 
+function splitAudienceIds(value?: string) {
+  return (value ?? "")
+    .split(",")
+    .map((id) => id.trim())
+    .filter(Boolean);
+}
+
 export function buildKlaviyoCampaignPayload(
   input: CampaignInput,
   strategy: CampaignStrategy,
@@ -54,7 +61,7 @@ export function buildKlaviyoCampaignPayload(
   const safeCampaignName = campaignName.toLowerCase().includes("do not send")
     ? campaignName
     : `${campaignName} - Draft Test - Do Not Send`;
-  const includedAudiences = audience?.id ? [audience.id] : [];
+  const includedAudiences = splitAudienceIds(audience?.id);
 
   return {
     data: {
@@ -198,12 +205,12 @@ export function createMockKlaviyoDraft(
 }
 
 async function resolveKlaviyoAudience(input: CampaignInput): Promise<KlaviyoAudienceResolution> {
-  const klaviyoAudienceId = input.klaviyoAudienceId?.trim();
+  const klaviyoAudienceIds = splitAudienceIds(input.klaviyoAudienceId);
 
-  if (klaviyoAudienceId) {
+  if (klaviyoAudienceIds.length) {
     return {
-      id: klaviyoAudienceId,
-      name: input.audience ? `${input.audience} / Klaviyo ${klaviyoAudienceId}` : `Klaviyo ${klaviyoAudienceId}`,
+      id: klaviyoAudienceIds.join(", "),
+      name: input.audience ? `${input.audience} / Klaviyo ${klaviyoAudienceIds.join(", ")}` : `Klaviyo ${klaviyoAudienceIds.join(", ")}`,
       source: "selected"
     };
   }

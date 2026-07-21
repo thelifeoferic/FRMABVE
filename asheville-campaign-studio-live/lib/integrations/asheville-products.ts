@@ -2,6 +2,125 @@ import type { BrandId, ProductOption } from "@/lib/types/campaign";
 
 const PRODUCT_SOURCE_URL = "https://avldispensary.com/";
 const STORE_PRODUCTS_URL = "https://avldispensary.com/wp-json/wc/store/v1/products";
+const WORDPRESS_SEARCH_URL = "https://avldispensary.com/wp-json/wp/v2/search";
+const PRODUCT_SITEMAP_URLS = [
+  "https://avldispensary.com/product-sitemap.xml",
+  "https://avldispensary.com/product-sitemap1.xml",
+  "https://avldispensary.com/page-sitemap.xml"
+];
+const PRODUCT_PAGE_LIMIT = 8;
+
+const ashevilleCatalogProducts: ProductOption[] = [
+  {
+    id: "trop-cherry-strain",
+    name: "Trop Cherry THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower / Private Reserve",
+    url: "https://avldispensary.com/shop/thca/thca-flower/private-reserve-thca-flower/trop-cherry-strain/"
+  },
+  {
+    id: "super-boof-strain",
+    name: "Super Boof THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower / Private Reserve",
+    url: "https://avldispensary.com/shop/thca/thca-flower/private-reserve-thca-flower/super-boof-strain/"
+  },
+  {
+    id: "secret-cookies-strain",
+    name: "Secret Cookies THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower / Private Reserve",
+    url: "https://avldispensary.com/shop/thca/thca-flower/private-reserve-thca-flower/secret-cookies-strain/"
+  },
+  {
+    id: "blue-dream-strain",
+    name: "Blue Dream THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/blue-dream-strain/"
+  },
+  {
+    id: "northern-lights-strain",
+    name: "Northern Lights THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/northern-lights-strain/"
+  },
+  {
+    id: "mendo-breath-strain",
+    name: "Mendo Breath THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/mendo-breath-strain/"
+  },
+  {
+    id: "orange-push-pop-strain",
+    name: "Orange Push Pop THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/orange-push-pop-strain/"
+  },
+  {
+    id: "banana-kush-strain",
+    name: "Banana Kush THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/banana-kush-strain/"
+  },
+  {
+    id: "rainbow-chip-strain",
+    name: "Rainbow Chip THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/rainbow-chip-strain/"
+  },
+  {
+    id: "caked-up-cherries-strain",
+    name: "Caked Up Cherries THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/caked-up-cherries-strain/"
+  },
+  {
+    id: "bananaconda-strain",
+    name: "Bananaconda THCA Flower",
+    source: "asheville-dispensary",
+    category: "Flower",
+    url: "https://avldispensary.com/shop/thca/thca-flower/bananaconda-strain/"
+  },
+  {
+    id: "sour-diesel-thca-vape",
+    name: "Sativa 3 Gram THCA Vape - Sour Diesel",
+    source: "asheville-dispensary",
+    category: "Vapes",
+    price: "$50.00",
+    url: "https://avldispensary.com/"
+  },
+  {
+    id: "delta-9-gummies-feel-good-gummies",
+    name: "Delta 9 Gummies - Feel Good Gummies",
+    source: "asheville-dispensary",
+    category: "Gummies",
+    price: "From $33",
+    url: "https://avldispensary.com/"
+  },
+  {
+    id: "delta-9-seltzer-bliss-10mg",
+    name: "Delta 9 Seltzer - Bliss 10mg",
+    source: "asheville-dispensary",
+    category: "Seltzer",
+    price: "From $5.60",
+    url: "https://avldispensary.com/"
+  },
+  {
+    id: "cbd-sleep-gummies-sleepy-time-gummies",
+    name: "CBD Sleep Gummies - Sleepy Time Gummies",
+    source: "asheville-dispensary",
+    category: "Gummies",
+    price: "From $33",
+    url: "https://avldispensary.com/"
+  }
+];
 
 const fallbackProducts: ProductOption[] = [
   {
@@ -107,6 +226,59 @@ type StoreProduct = {
   categories?: Array<{ name: string }>;
 };
 
+type WordPressSearchResult = {
+  id: number;
+  title?: string;
+  url?: string;
+  subtype?: string;
+};
+
+function matchesQuery(product: ProductOption, query: string) {
+  const normalizedQuery = query.trim().toLowerCase();
+
+  if (!normalizedQuery) return true;
+
+  return [product.name, product.category, product.price, product.url]
+    .filter(Boolean)
+    .some((value) => value?.toLowerCase().includes(normalizedQuery));
+}
+
+function dedupeProducts(products: ProductOption[]) {
+  return Array.from(
+    new Map(products.map((product) => [product.url || product.id || slugify(product.name), product])).values()
+  );
+}
+
+function getFallbackProducts(query: string) {
+  const matches = ashevilleCatalogProducts.filter((product) => matchesQuery(product, query));
+  return query.trim() ? matches : ashevilleCatalogProducts;
+}
+
+function isProductUrl(url: string) {
+  if (!url.startsWith("https://avldispensary.com/shop/")) return false;
+
+  return ![
+    "/product-category/",
+    "/cart",
+    "/checkout",
+    "/my-account",
+    "/wishlist"
+  ].some((blockedPath) => url.includes(blockedPath));
+}
+
+function inferCategoryFromUrl(url: string, name: string) {
+  const normalized = `${url} ${name}`.toLowerCase();
+
+  if (normalized.includes("thca-flower") || normalized.includes("flower")) return "Flower";
+  if (normalized.includes("pre-roll") || normalized.includes("preroll")) return "Pre-Rolls";
+  if (normalized.includes("vape")) return "Vapes";
+  if (normalized.includes("gumm")) return "Gummies";
+  if (normalized.includes("seltzer")) return "Seltzer";
+  if (normalized.includes("tincture")) return "Tinctures";
+
+  return "Website";
+}
+
 function formatStorePrice(product: StoreProduct) {
   const price = product.prices?.price;
 
@@ -120,10 +292,10 @@ function formatStorePrice(product: StoreProduct) {
   return Number.isFinite(amount) ? `${prefix}${amount.toFixed(2)}${suffix}` : undefined;
 }
 
-async function getStoreProducts(query: string): Promise<ProductOption[]> {
+async function getStoreProductPage(query: string, page: number): Promise<ProductOption[]> {
   const url = new URL(STORE_PRODUCTS_URL);
   url.searchParams.set("per_page", "100");
-  url.searchParams.set("page", "1");
+  url.searchParams.set("page", String(page));
 
   if (query) {
     url.searchParams.set("search", query);
@@ -153,14 +325,193 @@ async function getStoreProducts(query: string): Promise<ProductOption[]> {
   }));
 }
 
+async function getStoreProducts(query: string): Promise<ProductOption[]> {
+  const directSearchPages = await Promise.all(
+    Array.from({ length: PRODUCT_PAGE_LIMIT }, (_, index) => getStoreProductPage(query, index + 1).catch(() => []))
+  );
+  const directSearchProducts = dedupeProducts(directSearchPages.flat());
+
+  if (directSearchProducts.length >= 12 || !query.trim()) {
+    return directSearchProducts.filter((product) => matchesQuery(product, query));
+  }
+
+  const allProductPages = await Promise.all(
+    Array.from({ length: PRODUCT_PAGE_LIMIT }, (_, index) => getStoreProductPage("", index + 1).catch(() => []))
+  );
+  const allProducts = dedupeProducts([...directSearchProducts, ...allProductPages.flat()]);
+
+  return allProducts.filter((product) => matchesQuery(product, query));
+}
+
+async function getWordPressSearchProducts(query: string): Promise<ProductOption[]> {
+  const normalizedQuery = query.trim();
+
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  const url = new URL(WORDPRESS_SEARCH_URL);
+  url.searchParams.set("search", normalizedQuery);
+  url.searchParams.set("type", "post");
+  url.searchParams.set("subtype", "product");
+  url.searchParams.set("per_page", "50");
+
+  const response = await fetch(url, {
+    next: { revalidate: 300 },
+    headers: {
+      accept: "application/json",
+      "user-agent": "Asheville Campaign Studio WordPress product search"
+    }
+  });
+
+  if (!response.ok) {
+    return [];
+  }
+
+  const results = (await response.json()) as WordPressSearchResult[];
+
+  return results
+    .filter((result) => result.subtype === "product" && result.url && isProductUrl(result.url))
+    .map((result) => {
+      const name = decodeEntities(result.title ?? productNameFromUrl(result.url ?? ""));
+
+      return {
+        id: String(result.id),
+        name,
+        source: "asheville-dispensary" as const,
+        category: inferCategoryFromUrl(result.url ?? "", name),
+        url: result.url
+      };
+    })
+    .filter((product) => matchesQuery(product, normalizedQuery));
+}
+
+function productNameFromUrl(url: string) {
+  const slug =
+    url
+      .replace(/\/$/, "")
+      .split("/")
+      .filter(Boolean)
+      .pop() ?? "";
+
+  return slug
+    .split("-")
+    .filter(Boolean)
+    .map((part) => {
+      const lower = part.toLowerCase();
+      if (lower === "thca") return "THCA";
+      if (lower === "cbd") return "CBD";
+      if (lower === "cbg") return "CBG";
+      if (lower === "cbn") return "CBN";
+      return part.charAt(0).toUpperCase() + part.slice(1);
+    })
+    .join(" ");
+}
+
+async function getHtmlSearchProducts(query: string): Promise<ProductOption[]> {
+  const normalizedQuery = query.trim();
+
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  const searchUrls = [
+    `https://avldispensary.com/?s=${encodeURIComponent(normalizedQuery)}&post_type=product`,
+    `https://avldispensary.com/shop/?s=${encodeURIComponent(normalizedQuery)}&post_type=product`
+  ];
+  const responses = await Promise.all(
+    searchUrls.map(async (searchUrl) => {
+      const response = await fetch(searchUrl, {
+        next: { revalidate: 300 },
+        headers: {
+          accept: "text/html",
+          "user-agent": "Asheville Campaign Studio HTML product search"
+        }
+      });
+
+      return response.ok ? response.text() : "";
+    })
+  );
+  const urls = responses
+    .flatMap((html) => Array.from(html.matchAll(/href=["']([^"']+)["']/gi)).map((match) => decodeEntities(match[1])))
+    .map((url) => {
+      if (url.startsWith("/")) return `https://avldispensary.com${url}`;
+      return url;
+    })
+    .filter(isProductUrl);
+
+  return dedupeProducts(
+    urls.map((url) => {
+      const name = productNameFromUrl(url);
+
+      return {
+        id: slugify(url),
+        name,
+        source: "asheville-dispensary" as const,
+        category: inferCategoryFromUrl(url, name),
+        url
+      };
+    })
+  ).filter((product) => matchesQuery(product, normalizedQuery));
+}
+
+async function getSitemapProducts(query: string): Promise<ProductOption[]> {
+  const sitemapResponses = await Promise.all(
+    PRODUCT_SITEMAP_URLS.map(async (sitemapUrl) => {
+      const response = await fetch(sitemapUrl, {
+        next: { revalidate: 3600 },
+        headers: {
+          accept: "application/xml,text/xml",
+          "user-agent": "Asheville Campaign Studio sitemap product importer"
+        }
+      });
+
+      return response.ok ? response.text() : "";
+    })
+  );
+  const urls = sitemapResponses
+    .flatMap((xml) => Array.from(xml.matchAll(/<loc>(.*?)<\/loc>/gi)).map((match) => decodeEntities(match[1])))
+    .filter(isProductUrl);
+  const products = urls.map((url) => {
+    const slug =
+      url
+        .replace(/\/$/, "")
+        .split("/")
+        .filter(Boolean)
+        .pop() ?? "";
+    const name = productNameFromUrl(url);
+
+    return {
+      id: slug || slugify(name),
+      name,
+      source: "asheville-dispensary" as const,
+      category: inferCategoryFromUrl(url, name),
+      url
+    };
+  });
+
+  return dedupeProducts(products).filter((product) => matchesQuery(product, query));
+}
+
 export async function getAshevilleProducts(query = ""): Promise<ProductOption[]> {
   const trimmedQuery = query.trim();
 
   try {
+    const wordpressProducts = await getWordPressSearchProducts(trimmedQuery).catch(() => []);
+    const htmlSearchProducts = await getHtmlSearchProducts(trimmedQuery).catch(() => []);
     const storeProducts = await getStoreProducts(trimmedQuery);
+    const sitemapProducts = await getSitemapProducts(trimmedQuery).catch(() => []);
+    const catalogProducts = getFallbackProducts(trimmedQuery);
+    const directSearchProducts = dedupeProducts([
+      ...wordpressProducts,
+      ...htmlSearchProducts,
+      ...storeProducts,
+      ...sitemapProducts,
+      ...catalogProducts
+    ]);
 
-    if (storeProducts.length) {
-      return storeProducts;
+    if (directSearchProducts.length) {
+      return directSearchProducts.slice(0, 200);
     }
 
     const response = await fetch(PRODUCT_SOURCE_URL, {
@@ -171,7 +522,7 @@ export async function getAshevilleProducts(query = ""): Promise<ProductOption[]>
     });
 
     if (!response.ok) {
-      return fallbackProducts;
+      return getFallbackProducts(trimmedQuery);
     }
 
     const html = await response.text();
@@ -199,9 +550,14 @@ export async function getAshevilleProducts(query = ""): Promise<ProductOption[]>
       ? deduped.filter((product) => product.name.toLowerCase().includes(trimmedQuery.toLowerCase()))
       : deduped;
 
-    return filtered.length ? filtered.slice(0, 100) : fallbackProducts;
+    return filtered.length ? filtered.slice(0, 200) : getFallbackProducts(trimmedQuery);
   } catch {
-    return fallbackProducts;
+    try {
+      const sitemapProducts = await getSitemapProducts(trimmedQuery);
+      return sitemapProducts.length ? sitemapProducts.slice(0, 200) : getFallbackProducts(trimmedQuery);
+    } catch {
+      return getFallbackProducts(trimmedQuery);
+    }
   }
 }
 

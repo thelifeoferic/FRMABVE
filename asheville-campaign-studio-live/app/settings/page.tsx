@@ -1,3 +1,5 @@
+import { AppHeader } from "@/components/AppHeader/AppHeader";
+
 const brandKits = [
   {
     id: "asheville",
@@ -154,6 +156,8 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
   return (
     <main className="settings-page brand-kit-page" data-brand={activeBrand.id}>
+      <AppHeader active="settings" brandId={activeBrand.id} brandName={activeBrand.name} />
+
       <section className="panel brand-kit-hero">
         <div className="brand-kit-hero-grid">
           <div>

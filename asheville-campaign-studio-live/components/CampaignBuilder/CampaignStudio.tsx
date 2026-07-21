@@ -2,7 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ApprovalPanel } from "@/components/ApprovalPanel/ApprovalPanel";
+import { AppHeader } from "@/components/AppHeader/AppHeader";
+import { ImageEditStudio } from "@/components/ImageEditor/ImageEditStudio";
 import { ImageSetPanel } from "@/components/ImageGeneration/ImageSetPanel";
+import { KlaviyoFieldsPanel } from "@/components/KlaviyoFields/KlaviyoFieldsPanel";
 import { PromptBox } from "@/components/PromptBox/PromptBox";
 import { SocialKitPanel } from "@/components/SocialKit/SocialKitPanel";
 import { campaignBrands, getCampaignBrand } from "@/lib/brand/default-brand";
@@ -42,9 +45,10 @@ const initialInput: CampaignInput = {
   notes: ""
 };
 
-const steps = ["Brief", "Klaviyo Fields", "Images", "Review", "Klaviyo Draft"];
+const steps = ["Brief", "Klaviyo Fields", "Images", "Edit", "Review", "Klaviyo Draft"];
 const economyImageCount = 3;
 const similarVariants: GeneratedImage["version"][] = ["A", "B", "C"];
+type EditOutput = "square" | "story" | "wide";
 
 export function CampaignStudio() {
   const [input, setInput] = useState<CampaignInput>(initialInput);
@@ -65,9 +69,12 @@ export function CampaignStudio() {
   const [drafting, setDrafting] = useState(false);
   const [exportingDrive, setExportingDrive] = useState(false);
   const [generatingImages, setGeneratingImages] = useState(false);
+  const [editingImage, setEditingImage] = useState(false);
+  const [imageEditError, setImageEditError] = useState("");
   const promptRef = useRef<HTMLDivElement>(null);
-  const packageRef = useRef<HTMLDivElement>(null);
+  const fieldsRef = useRef<HTMLDivElement>(null);
   const imagesRef = useRef<HTMLDivElement>(null);
+  const editRef = useRef<HTMLDivElement>(null);
   const draftRef = useRef<HTMLDivElement>(null);
 
   const selectedConcept =
@@ -75,6 +82,7 @@ export function CampaignStudio() {
     concepts.find((concept) => concept.name === generatedImages.find((image) => image.id === selectedImageId)?.style) ??
     null;
   const selectedImage = generatedImages.find((image) => image.id === selectedImageId) ?? null;
+  const activeStepIndex = draft ? 5 : selectedImage ? 3 : strategy ? 1 : 0;
 
   useEffect(() => {
     async function loadAudiences() {
@@ -136,6 +144,7 @@ export function CampaignStudio() {
     setGeneratedImages([]);
     setSelectedConceptId(null);
     setSelectedImageId(null);
+    setImageEditError("");
     setDraft(null);
     setDriveExport(null);
   }
@@ -145,11 +154,13 @@ export function CampaignStudio() {
     const nextFields = createMockKlaviyoFields(input);
     const nextInput = {
       ...input,
+      campaignName: input.campaignName || nextFields.campaignName,
       fromName: input.fromName || selectedBrand.sample.fromName,
       fromEmail: input.fromEmail || selectedBrand.sample.fromEmail,
       replyToEmail: input.replyToEmail || selectedBrand.sample.replyToEmail,
       subjectLine: input.subjectLine || nextFields.subjectLine,
-      previewText: input.previewText || nextFields.previewText
+      previewText: input.previewText || nextFields.previewText,
+      cta: input.cta || nextFields.cta
     };
     setStrategy(nextStrategy);
     const nextImages = createMockImageSet(nextInput, nextStrategy, concepts);
@@ -157,11 +168,12 @@ export function CampaignStudio() {
     setGeneratedImages(nextImages);
     setSelectedConceptId("cream-studio");
     setSelectedImageId(null);
+    setImageEditError("");
     setDraft(null);
     setDriveExport(null);
 
     window.requestAnimationFrame(() => {
-      packageRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      fieldsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }
 
@@ -169,8 +181,10 @@ export function CampaignStudio() {
     const nextFields = createMockKlaviyoFields(input);
     setInput((current) => ({
       ...current,
+      campaignName: nextFields.campaignName,
       subjectLine: nextFields.subjectLine,
-      previewText: nextFields.previewText
+      previewText: nextFields.previewText,
+      cta: nextFields.cta
     }));
     setDraft(null);
     setDriveExport(null);
@@ -179,8 +193,9 @@ export function CampaignStudio() {
   function scrollToStep(step: string) {
     const refs: Record<string, RefObject<HTMLElement | HTMLDivElement | null>> = {
       Brief: promptRef,
-      "Klaviyo Fields": promptRef,
+      "Klaviyo Fields": fieldsRef,
       Images: imagesRef,
+      Edit: editRef,
       Review: draftRef,
       "Klaviyo Draft": draftRef
     };
@@ -232,36 +247,53 @@ export function CampaignStudio() {
     setExportingDrive(false);
   }
 
-  async function generateImages() {
+  async function generateImages(style: GeneratedImage["style"]) {
     if (!generatedImages.length) return;
 
-    const imagesToGenerate = generatedImages.slice(0, economyImageCount);
+    const imagesToGenerate = generatedImages.filter((image) => image.style === style).slice(0, economyImageCount);
+
+    if (!imagesToGenerate.length) return;
 
     setGeneratingImages(true);
     setGeneratedImages(imagesToGenerate.map((image) => ({ ...image, status: "generating" })));
 
-    const response = await fetch("/api/images/generate", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        images: imagesToGenerate
-      })
-    });
-    const body = (await response.json()) as { images?: GeneratedImage[] };
+    try {
+      const response = await fetch("/api/images/generate", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          images: imagesToGenerate
+        })
+      });
+      const body = (await response.json().catch(() => ({}))) as { images?: GeneratedImage[]; error?: string };
 
-    if (body.images?.length) {
-      setGeneratedImages(body.images);
-      setSelectedImageId(body.images.find((image) => image.imageUrl)?.id ?? null);
-      setDriveExport(null);
-    } else {
+      if (!response.ok) {
+        throw new Error(body.error ?? `Image generation returned HTTP ${response.status}.`);
+      }
+
+      if (body.images?.length) {
+        setGeneratedImages(body.images);
+        setSelectedImageId(body.images.find((image) => image.imageUrl)?.id ?? null);
+        setImageEditError("");
+        setDriveExport(null);
+      } else {
+        setGeneratedImages((current) =>
+          current.map((image) => ({ ...image, status: "failed", error: "Image generation did not return images." }))
+        );
+      }
+    } catch (error) {
       setGeneratedImages((current) =>
-        current.map((image) => ({ ...image, status: "failed", error: "Image generation did not return images." }))
+        current.map((image) => ({
+          ...image,
+          status: "failed",
+          error: error instanceof Error ? error.message : "Image generation request failed."
+        }))
       );
+    } finally {
+      setGeneratingImages(false);
     }
-
-    setGeneratingImages(false);
   }
 
   async function generateSimilarImages() {
@@ -287,32 +319,89 @@ export function CampaignStudio() {
     setSelectedImageId(null);
     setDraft(null);
 
-    const response = await fetch("/api/images/generate", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json"
-      },
-      body: JSON.stringify({
-        images: similarBriefs
-      })
-    });
-    const body = (await response.json()) as { images?: GeneratedImage[] };
+    try {
+      const response = await fetch("/api/images/generate", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          images: similarBriefs
+        })
+      });
+      const body = (await response.json().catch(() => ({}))) as { images?: GeneratedImage[]; error?: string };
 
-    if (body.images?.length) {
-      setGeneratedImages(body.images);
-      setSelectedImageId(body.images.find((image) => image.imageUrl)?.id ?? null);
-      setDriveExport(null);
-    } else {
+      if (!response.ok) {
+        throw new Error(body.error ?? `Similar image generation returned HTTP ${response.status}.`);
+      }
+
+      if (body.images?.length) {
+        setGeneratedImages(body.images);
+        setSelectedImageId(body.images.find((image) => image.imageUrl)?.id ?? null);
+        setImageEditError("");
+        setDriveExport(null);
+      } else {
+        setGeneratedImages((current) =>
+          current.map((image) => ({ ...image, status: "failed", error: "Similar image generation did not return images." }))
+        );
+      }
+    } catch (error) {
       setGeneratedImages((current) =>
-        current.map((image) => ({ ...image, status: "failed", error: "Similar image generation did not return images." }))
+        current.map((image) => ({
+          ...image,
+          status: "failed",
+          error: error instanceof Error ? error.message : "Similar image generation request failed."
+        }))
       );
+    } finally {
+      setGeneratingImages(false);
     }
+  }
 
-    setGeneratingImages(false);
+  async function editSelectedImage(editPrompt: string, output: EditOutput) {
+    if (!selectedImage?.imageUrl) return;
+
+    setEditingImage(true);
+    setImageEditError("");
+
+    try {
+      const response = await fetch("/api/images/edit", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json"
+        },
+        body: JSON.stringify({
+          image: selectedImage,
+          editPrompt,
+          output
+        })
+      });
+      const body = (await response.json().catch(() => ({}))) as { image?: GeneratedImage; error?: string };
+
+      if (!response.ok || !body.image) {
+        throw new Error(body.error ?? `Image edit returned HTTP ${response.status}.`);
+      }
+
+      setGeneratedImages((current) => [body.image as GeneratedImage, ...current.filter((image) => image.id !== body.image?.id)]);
+      setSelectedImageId(body.image.id);
+      setSelectedConceptId(concepts.find((concept) => concept.name === body.image?.style)?.id ?? null);
+      setDraft(null);
+      setDriveExport(null);
+
+      window.requestAnimationFrame(() => {
+        editRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    } catch (error) {
+      setImageEditError(error instanceof Error ? error.message : "Image edit request failed.");
+    } finally {
+      setEditingImage(false);
+    }
   }
 
   return (
     <main className="studio-shell" data-brand={selectedBrand.id}>
+      <AppHeader active="studio" brandId={selectedBrand.id} brandName={selectedBrand.name} />
+
       <header className="topbar">
         <img src={selectedBrand.heroSrc} alt={selectedBrand.heroAlt} />
         <img className="hero-brand-logo" src={selectedBrand.logoSrc} alt={`${selectedBrand.name} logo`} />
@@ -338,7 +427,7 @@ export function CampaignStudio() {
         {steps.map((step, index) => (
           <button
             key={step}
-            className={index <= (draft ? 4 : selectedConcept ? 3 : strategy ? 2 : 0) ? "active" : ""}
+            className={index <= activeStepIndex ? "active" : ""}
             type="button"
             onClick={() => scrollToStep(step)}
           >
@@ -366,27 +455,56 @@ export function CampaignStudio() {
             brand={selectedBrand}
             onChange={setInput}
             onGenerate={generateStrategy}
-            onGenerateFields={generateKlaviyoFields}
             onProductSearch={searchProducts}
           />
         </div>
 
-        <div className="right-column" ref={packageRef}>
+        <div className="right-column">
+          <div ref={fieldsRef}>
+            {strategy ? (
+              <KlaviyoFieldsPanel
+                value={input}
+                brand={selectedBrand}
+                onChange={setInput}
+                onGenerateFields={generateKlaviyoFields}
+              />
+            ) : (
+              <section className="panel klaviyo-review-panel klaviyo-review-empty" aria-label="Klaviyo fields">
+                <div className="section-heading">
+                  <p>Klaviyo Fields</p>
+                  <span>Waiting for package</span>
+                </div>
+                <strong>Generate the campaign package first.</strong>
+                <p>Subject, preview, CTA, campaign name, and sender fields will appear here for review.</p>
+              </section>
+            )}
+          </div>
+
           <div ref={imagesRef}>
             <ImageSetPanel
               images={generatedImages}
               selectedImageId={selectedImageId}
               includeLogo={input.includeLogo}
               generating={generatingImages}
-              brand={selectedBrand}
               onSelectImage={(image) => {
                 setSelectedImageId(image.id);
                 setSelectedConceptId(concepts.find((concept) => concept.name === image.style)?.id ?? null);
+                setImageEditError("");
                 setDraft(null);
                 setDriveExport(null);
               }}
               onGenerateImages={generateImages}
               onGenerateSimilar={generateSimilarImages}
+            />
+          </div>
+
+          <div ref={editRef}>
+            <ImageEditStudio
+              selectedImage={selectedImage}
+              brand={selectedBrand}
+              editing={editingImage}
+              error={imageEditError}
+              onEditImage={editSelectedImage}
             />
           </div>
 

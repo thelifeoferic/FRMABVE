@@ -1,3 +1,5 @@
+import { AppHeader } from "@/components/AppHeader/AppHeader";
+
 const promptGroups = [
   {
     id: "asheville",
@@ -45,9 +47,49 @@ Here is the existing HTML:
 
 [PASTE EXISTING HTML]
 
-Here are the only requested updates:
+	Here are the only requested updates:
+	
+	[PASTE NEW STRAINS, COPY, LINKS, IMAGES, OR OTHER CHANGES]`
+      },
+      {
+        title: "Product Truth Rule",
+        type: "Content accuracy",
+        summary: "Prevents invented product facts in campaign copy, images, and Klaviyo fields.",
+        download: "/brand-kit/asheville-dispensary/prompts/product-truth-rule.txt",
+        rules: [
+          "Never invent THCA percentages, strain types, effects, prices, product names, URLs, or availability.",
+          "Use only verified product details supplied by the user, Alpine IQ, Klaviyo, or the Asheville Dispensary product source.",
+          "If a product detail is missing, leave it blank, flag it for review, or ask for the verified value."
+        ],
+        code: `Asheville Dispensary Product Truth Rule
 
-[PASTE NEW STRAINS, COPY, LINKS, IMAGES, OR OTHER CHANGES]`
+Never invent THCA percentages, strain types, effects, prices, product names, URLs, or availability.
+
+Use only verified product details supplied by the user, Alpine IQ, Klaviyo, or the Asheville Dispensary product source.
+
+If a product detail is missing, leave it blank, flag it for review, or ask for the verified value. Do not fill gaps with likely-sounding cannabis details.
+
+This rule applies to campaign strategy, subject lines, preview text, Klaviyo fields, product cards, image prompts, image text, social captions, and final review checklists.`
+      },
+      {
+        title: "Email Structure Preservation",
+        type: "HTML update",
+        summary: "Keeps existing Klaviyo HTML layouts intact when campaign content is updated.",
+        download: "/brand-kit/asheville-dispensary/prompts/email-structure-preservation.txt",
+        rules: [
+          "When editing existing Klaviyo HTML, preserve wrappers, mobile styles, buttons, links, and layout.",
+          "Do not rename classes, remove media queries, flatten sections, or simplify markup.",
+          "Return the complete updated HTML, not snippets."
+        ],
+        code: `Asheville Dispensary Email Structure Preservation
+
+When editing existing Klaviyo HTML, preserve wrappers, mobile styles, buttons, links, and layout.
+
+Do not rename classes, remove media queries, flatten sections, simplify markup, change spacing systems, alter button styling, remove tracked links, or restructure the template unless explicitly instructed.
+
+Only update the specific content requested: copy, product details, URLs, image references, campaign dates, offers, or selected sections.
+
+Before returning the final HTML, verify that all opening and closing tags are intact, all responsive behavior remains in place, all cards/buttons/links remain clickable, and the final output is one complete ready-to-paste HTML block.`
       },
       {
         title: "Campaign Image Direction",
@@ -64,8 +106,68 @@ Here are the only requested updates:
 Use product-forward composition, warm cream surfaces, deep green and warm gold accents, readable packaging, restrained copy hierarchy, and cannabis apothecary-lounge polish.
 
 The full product or package must stay inside the frame with generous margin on all sides. Do not crop product names, CTA copy, logos, or important packaging details.
+	
+	Use Iskra W01 selectively for short Asheville display moments and Montserrat for practical campaign copy. Keep the image clean, review-ready, and suitable for Klaviyo campaign approval.`
+      },
+      {
+        title: "Asset Respect Rule",
+        type: "Creative direction",
+        summary: "Treats uploaded references as source material instead of loose inspiration.",
+        download: "/brand-kit/asheville-dispensary/prompts/asset-respect-rule.txt",
+        rules: [
+          "Uploaded assets are references/source material.",
+          "Do not reinterpret logos or packaging unless explicitly asked.",
+          "Preserve visible packaging cues, logo details, proportions, and product identity."
+        ],
+        code: `Asheville Dispensary Asset Respect Rule
 
-Use Iskra W01 selectively for short Asheville display moments and Montserrat for practical campaign copy. Keep the image clean, review-ready, and suitable for Klaviyo campaign approval.`
+Uploaded assets are references/source material.
+
+Do not reinterpret logos or packaging unless explicitly asked. Do not redraw, rename, recolor, crop, distort, simplify, or replace visible brand marks, package shapes, labels, product names, flavor cues, compliance text, or other identifying details.
+
+Use uploaded assets to preserve accurate visual direction: product identity, logo placement, color cues, packaging structure, material finish, label hierarchy, and composition notes.
+
+If an asset is low-resolution, partially cropped, or unclear, preserve what is visible and flag uncertain details for human review instead of inventing replacements.`
+      },
+      {
+        title: "Regenerate From Selected Style",
+        type: "Image generation",
+        summary: "Uses an approved image as the visual anchor for future image variations.",
+        download: "/brand-kit/asheville-dispensary/prompts/regenerate-from-selected-style.txt",
+        rules: [
+          "When an image is selected, future generations should preserve that image's composition and style.",
+          "Vary only controlled details such as crop, prop placement, background texture, lighting nuance, or copy treatment.",
+          "Do not drift into a different art direction unless the user requests a new direction."
+        ],
+        code: `Asheville Dispensary Regenerate From Selected Style
+
+When an image is selected, future generations should preserve that image's composition/style while varying details.
+
+Treat the selected image as the approved visual direction. Preserve its core framing, product scale, mood, lighting style, background language, color balance, depth, hierarchy, and overall campaign tone.
+
+Vary only controlled details such as crop, prop placement, product angle, background texture, lighting nuance, secondary visual cues, and copy treatment.
+
+Do not drift into a different art direction, palette, package treatment, illustration style, or layout system unless the user explicitly requests a new direction.`
+      },
+      {
+        title: "Logo Usage Integrity",
+        type: "Brand rule",
+        summary: "Protects the Asheville Dispensary logo from edits, cropping, recoloring, or distortion.",
+        download: "/brand-kit/asheville-dispensary/prompts/logo-usage-integrity.txt",
+        rules: [
+          "Use the provided Asheville Dispensary logo exactly as shown.",
+          "Keep the full logo visible with its original aspect ratio.",
+          "Do not alter, redraw, crop, recolor, distort, replace, or modify any logo detail."
+        ],
+        code: `Asheville Dispensary Logo Usage Integrity
+
+Use the provided Asheville Dispensary logo exactly as shown.
+
+Do not alter, redraw, crop, recolor, distort, replace, or modify any text, symbols, proportions, or details.
+
+Keep the logo fully visible and preserve its original aspect ratio.
+
+When placing the logo in campaign images, brand assets, Klaviyo creative, social kit exports, or review mockups, treat the logo as a locked brand asset. It may be resized proportionally only when necessary for layout, but it must remain sharp, readable, uncropped, and visually faithful to the source file.`
       },
       {
         title: "CTA Button Integrity",
@@ -128,6 +230,8 @@ export default async function PromptsPage({ searchParams }: PromptsPageProps) {
 
   return (
     <main className="settings-page prompts-page" data-brand={activeGroup.id}>
+      <AppHeader active="prompts" brandId={activeGroup.id} brandName={activeGroup.label} />
+
       <section className="panel brand-kit-hero prompts-hero">
         <div className="section-heading">
           <p>AI Prompts</p>
