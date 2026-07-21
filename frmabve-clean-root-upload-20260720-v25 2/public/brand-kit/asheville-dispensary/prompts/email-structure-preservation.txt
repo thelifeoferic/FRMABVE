@@ -1,0 +1,9 @@
+Asheville Dispensary Email Structure Preservation
+
+When editing existing Klaviyo HTML, preserve wrappers, mobile styles, buttons, links, and layout.
+
+Do not rename classes, remove media queries, flatten sections, simplify markup, change spacing systems, alter button styling, remove tracked links, or restructure the template unless explicitly instructed.
+
+Only update the specific content requested: copy, product details, URLs, image references, campaign dates, offers, or selected sections.
+
+Before returning the final HTML, verify that all opening and closing tags are intact, all responsive behavior remains in place, all cards/buttons/links remain clickable, and the final output is one complete ready-to-paste HTML block.
